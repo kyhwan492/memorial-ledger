@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+<head><%- include("partials/head") %></head>
+<body>
+<nav><a href="/">인물 목록</a></nav>
+<h1><%= person ? `${person.name} 기록 수정` : "새 인물 기록 등록" %></h1>
+<form method="post" action="/persons">
+  <p><label>슬러그(영문 id) <input name="slug" required
+     value="<%= person?.slug ?? "" %>" <%= person ? "readonly" : "" %>></label></p>
+  <p><label>이름 <input name="name" required value="<%= person?.name ?? "" %>"></label></p>
+  <p><label>분류
+    <select name="category">
+      <% for (const [k, label] of Object.entries(CATEGORIES)) { %>
+      <option value="<%= k %>" <%= person?.category === k ? "selected" : "" %>><%= label %></option>
+      <% } %>
+    </select></label></p>
+  <p><label>출생 <input name="birth" value="<%= person?.birth ?? "" %>"></label>
+     <label>사망 <input name="death" value="<%= person?.death ?? "" %>"></label></p>
+  <p><label>공적 요약<br>
+     <textarea name="summary" rows="8" cols="60"><%= person?.summary ?? "" %></textarea></label></p>
+  <button type="submit">정본 생성 → 앵커 단계로</button>
+</form>
+</body>
+</html>

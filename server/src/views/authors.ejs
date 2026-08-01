@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ko">
+<head><%- include("partials/head") %></head>
+<body>
+<nav><a href="/">인물 목록</a><a href="/authors">작성자</a></nav>
+<h1>작성자 (실명 공개)</h1>
+<p>이 원장의 기록은 아래 검증된 실명 작성자만 등록할 수 있습니다.</p>
+<table>
+  <thead><tr><th>이름</th><th>자격</th><th>지갑 주소</th></tr></thead>
+  <tbody>
+  <% for (const a of authors) { %>
+  <tr><td><%= a.name %></td><td><%= a.credential %></td><td><code><%= a.wallet %></code></td></tr>
+  <% } %>
+  </tbody>
+</table>
+</body>
+</html>

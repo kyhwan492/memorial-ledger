@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head><%- include("partials/head") %></head>
+<body>
+<nav><a href="/">인물 목록</a><a href="/authors">작성자</a></nav>
+<h1><%= person.name %></h1>
+<p><%= CATEGORIES[person.category] ?? person.category %> · <%= person.birth %>–<%= person.death %></p>
+<p><%= person.summary %></p>
+
+<h2>출처</h2>
+<ul>
+  <% for (const s of sources) { %>
+  <li><% if (s.url) { %><a href="<%= s.url %>" rel="noopener"><%= s.label %></a><% } else { %><%= s.label %><% } %></li>
+  <% } %>
+</ul>
+
+<h2>체인 검증</h2>
+<button id="verify-btn"
+        data-slug="<%= person.slug %>"
+        data-rpc-url="<%= chain.rpcUrl %>"
+        data-contract="<%= chain.contract %>">최신 기록 검증</button>
+<p id="verify-result"></p>
+
+<h2>버전 이력</h2>
+<table>
+  <thead><tr><th>버전</th><th>해시</th><th>상태</th><th>tx</th><th>등록 시각</th></tr></thead>
+  <tbody>
+  <% for (const v of versions) { %>
+  <tr>
+    <td>#<%= v.id %></td>
+    <td><code><%= v.content_hash.slice(0, 18) %>…</code></td>
+    <td><span class="badge <%= v.status === "anchored" ? "ok" : "warn" %>"><%= v.status %></span></td>
+    <td><% if (v.tx_hash) { %><code><%= v.tx_hash.slice(0, 14) %>…</code><% } %></td>
+    <td><%= v.created_at %></td>
+  </tr>
+  <% } %>
+  </tbody>
+</table>
+<p><a href="/persons/<%= person.slug %>/edit">이 기록 수정하기 (작성자 전용)</a></p>
+
+<script src="/vendor/ethers.umd.min.js"></script>
+<script type="module" src="/verify.js"></script>
+</body>
+</html>
