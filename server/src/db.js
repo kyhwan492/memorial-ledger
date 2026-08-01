@@ -1,4 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS persons (
@@ -34,6 +36,8 @@ CREATE TABLE IF NOT EXISTS record_versions (
 `;
 
 export function openDb(path = ":memory:") {
+  // data/ 는 gitignore 대상이라 클론 직후엔 없다 — 열기 전에 만든다
+  if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
   db.exec("PRAGMA foreign_keys = ON;");
   db.exec(SCHEMA);

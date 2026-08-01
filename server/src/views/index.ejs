@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head><%- include("partials/head") %></head>
+<body>
+<nav><a href="/">인물 목록</a><a href="/authors">작성자</a><a href="/persons/new/edit">기록 등록</a></nav>
+<h1>기억 원장</h1>
+<form>
+  <input type="search" name="q" value="<%= query %>" placeholder="이름 검색"
+         hx-get="/" hx-trigger="input changed delay:300ms" hx-target="#rows">
+  <select name="category" hx-get="/" hx-target="#rows">
+    <option value="">전체 분류</option>
+    <% for (const [k, label] of Object.entries(CATEGORIES)) { %>
+    <option value="<%= k %>" <%= k === category ? "selected" : "" %>><%= label %></option>
+    <% } %>
+  </select>
+</form>
+<table>
+  <thead><tr><th>이름</th><th>분류</th><th>생몰</th></tr></thead>
+  <tbody id="rows"><%- include("partials/person-rows", { persons, CATEGORIES }) %></tbody>
+</table>
+</body>
+</html>
