@@ -1,0 +1,44 @@
+# memorial-ledger (기억 원장)
+
+독립운동가·참전용사 등 인물 기록을 오프체인(SQLite)에 저장하고, 기록의
+keccak256 해시를 체인(RecordRegistry)에 앵커링하는 학습 프로젝트.
+누구나 브라우저에서 서버를 신뢰하지 않고 기록의 변조 여부를 검증할 수 있다.
+
+설계 문서: `docs/superpowers/specs/2026-08-01-record-registry-design.md`
+
+## 요구 사항
+
+- Node 24+ (node:sqlite, node:test)
+- MetaMask (기록 작성 시)
+
+## 로컬 실행
+
+```bash
+# 1. 체인
+cd contracts && npm install
+npx hardhat node                                  # 터미널 1
+npx hardhat run scripts/deploy.js --network localhost  # 터미널 2 — 주소 출력
+
+# 2. 서버
+cd ../server && npm install
+node scripts/seed.js
+CONTRACT_ADDRESS=<배포 주소> node src/server.js   # http://localhost:3000
+```
+
+기록 작성 테스트: MetaMask에 hardhat 계정 #1
+(`0x59c6...690d`, 로컬 전용 공개 키)을 임포트하고 네트워크를
+`http://127.0.0.1:8545` (chainId 31337)로 추가.
+
+## 테스트
+
+```bash
+cd contracts && npx hardhat test   # 컨트랙트
+cd server && npm test              # 서버 단위 + E2E
+```
+
+## Sepolia 배포
+
+```bash
+cd contracts
+SEPOLIA_RPC_URL=<rpc> PRIVATE_KEY=<key> npx hardhat run scripts/deploy.js --network sepolia
+```
