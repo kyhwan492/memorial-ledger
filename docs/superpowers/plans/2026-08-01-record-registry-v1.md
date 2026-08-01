@@ -33,7 +33,7 @@
 **Interfaces:**
 - Produces: `RecordRegistry` 컨트랙트 — `owner() view returns (address)`, `authorProfiles(address) view returns (string)`, `registerAuthor(address author, string profileUri)` (onlyOwner), 이벤트 `AuthorRegistered(address indexed author, string profileUri)`
 
-- [ ] **Step 1: 스캐폴드**
+- [x] **Step 1: 스캐폴드**
 
 ```bash
 cd /Users/yonghwan/Documents/Dev/memorial-ledger
@@ -66,7 +66,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 2: 실패하는 테스트 작성**
+- [x] **Step 2: 실패하는 테스트 작성**
 
 `contracts/test/RecordRegistry.test.js`:
 
@@ -109,12 +109,12 @@ describe("RecordRegistry: 작성자 등록", function () {
 });
 ```
 
-- [ ] **Step 3: 실패 확인**
+- [x] **Step 3: 실패 확인**
 
 Run: `cd contracts && npx hardhat test`
 Expected: 컴파일 에러 — `RecordRegistry.sol` 없음 (HH700 계열)
 
-- [ ] **Step 4: 최소 구현**
+- [x] **Step 4: 최소 구현**
 
 `contracts/contracts/RecordRegistry.sol`:
 
@@ -145,12 +145,12 @@ contract RecordRegistry {
 }
 ```
 
-- [ ] **Step 5: 통과 확인**
+- [x] **Step 5: 통과 확인**
 
 Run: `npx hardhat test`
 Expected: 4 passing
 
-- [ ] **Step 6: 커밋**
+- [x] **Step 6: 커밋**
 
 ```bash
 cd /Users/yonghwan/Documents/Dev/memorial-ledger
@@ -170,7 +170,7 @@ git commit -m "feat: RecordRegistry 작성자 등록부 (owner 전용 allowlist)
 - Consumes: Task 1의 `authorProfiles` allowlist
 - Produces: `anchor(bytes32 personId, bytes32 contentHash)` (등록 작성자만), `versionCount(bytes32) view returns (uint256)`, `getVersion(bytes32, uint256) view returns (bytes32, address, uint64)`, `latest(bytes32) view returns (bytes32, address, uint64)` (비어 있으면 revert "no versions"), 이벤트 `RecordAnchored(bytes32 indexed personId, bytes32 contentHash, address indexed author, uint256 versionIndex)`
 
-- [ ] **Step 1: 실패하는 테스트 추가**
+- [x] **Step 1: 실패하는 테스트 추가**
 
 `contracts/test/RecordRegistry.test.js`에 append:
 
@@ -222,12 +222,12 @@ describe("RecordRegistry: 해시 앵커링", function () {
 });
 ```
 
-- [ ] **Step 2: 실패 확인**
+- [x] **Step 2: 실패 확인**
 
 Run: `npx hardhat test`
 Expected: 기존 4 passing, 새 4개는 `registry.anchor is not a function`류 실패
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `RecordRegistry.sol`의 `registerAuthor` 아래에 추가:
 
@@ -276,12 +276,12 @@ Expected: 기존 4 passing, 새 4개는 `registry.anchor is not a function`류 �
     }
 ```
 
-- [ ] **Step 4: 통과 확인**
+- [x] **Step 4: 통과 확인**
 
 Run: `npx hardhat test`
 Expected: 8 passing
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add contracts/contracts/RecordRegistry.sol contracts/test/RecordRegistry.test.js
@@ -301,7 +301,7 @@ git commit -m "feat: 해시 앵커링 - 추가 전용 버전 이력과 조회 �
 **Interfaces:**
 - Produces: `canonicalize(value) -> string` — 브라우저·서버 공용 ESM. 키 사전순 정렬(재귀), 문자열·키 NFC 정규화, 공백 없는 JSON 문자열 반환. 해시는 호출자가 `ethers.keccak256(ethers.toUtf8Bytes(canonicalize(x)))`로 계산
 
-- [ ] **Step 1: 스캐폴드 + vendoring**
+- [x] **Step 1: 스캐폴드 + vendoring**
 
 ```bash
 cd /Users/yonghwan/Documents/Dev/memorial-ledger
@@ -314,7 +314,7 @@ cp node_modules/ethers/dist/ethers.umd.min.js public/vendor/ethers.umd.min.js
 curl -fsSL -o public/vendor/htmx.min.js https://unpkg.com/htmx.org@2/dist/htmx.min.js
 ```
 
-- [ ] **Step 2: 실패하는 테스트 작성**
+- [x] **Step 2: 실패하는 테스트 작성**
 
 `server/test/canonical.test.js`:
 
@@ -351,12 +351,12 @@ test("null과 숫자를 처리한다", () => {
 });
 ```
 
-- [ ] **Step 3: 실패 확인**
+- [x] **Step 3: 실패 확인**
 
 Run: `cd server && npm test`
 Expected: FAIL — `Cannot find module .../public/canonical.js`
 
-- [ ] **Step 4: 구현**
+- [x] **Step 4: 구현**
 
 `server/public/canonical.js`:
 
@@ -379,12 +379,12 @@ function sort(v) {
 }
 ```
 
-- [ ] **Step 5: 통과 확인**
+- [x] **Step 5: 통과 확인**
 
 Run: `npm test`
 Expected: 5 passing
 
-- [ ] **Step 6: 커밋**
+- [x] **Step 6: 커밋**
 
 ```bash
 cd /Users/yonghwan/Documents/Dev/memorial-ledger
@@ -414,7 +414,7 @@ git commit -m "feat: server 스캐폴드와 정본 직렬화 canonical.js"
   - `latestAnchored(db, personSlug) -> row | undefined`
   - `addAuthor(db, {name, credential, wallet}) -> authorId` / `getAuthor(db, id)` / `listAuthors(db)`
 
-- [ ] **Step 1: 실패하는 테스트 작성**
+- [x] **Step 1: 실패하는 테스트 작성**
 
 `server/test/db.test.js`:
 
@@ -481,12 +481,12 @@ test("sources와 authors", () => {
 });
 ```
 
-- [ ] **Step 2: 실패 확인**
+- [x] **Step 2: 실패 확인**
 
 Run: `npm test`
 Expected: db.test.js FAIL — `Cannot find module .../src/db.js` (canonical 5개는 계속 passing)
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `server/src/db.js`:
 
@@ -606,12 +606,12 @@ export function listAuthors(db) {
 }
 ```
 
-- [ ] **Step 4: 통과 확인**
+- [x] **Step 4: 통과 확인**
 
 Run: `npm test`
 Expected: 9 passing (canonical 5 + db 4)
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add server/src/db.js server/test/db.test.js
