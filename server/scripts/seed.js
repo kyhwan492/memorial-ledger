@@ -1,10 +1,6 @@
-import { mkdirSync } from "node:fs";
-import path from "node:path";
 import { openDb, upsertPerson, addSource, addAuthor } from "../src/db.js";
 
-const dbPath = process.env.DB_PATH ?? "data/ledger.db";
-mkdirSync(path.dirname(dbPath), { recursive: true }); // data/는 gitignore되어 없을 수 있음
-const db = openDb(dbPath);
+const db = openDb(process.env.DB_PATH ?? "data/ledger.db");
 
 const PERSONS = [
   { slug: "kim-gu", name: "김구", category: "independence", birth: "1876", death: "1949",

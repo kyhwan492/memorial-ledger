@@ -631,7 +631,7 @@ git commit -m "feat: node:sqlite 스키마와 쿼리 레이어"
 - Consumes: Task 4의 db.js 전체, Task 3의 canonical.js
 - Produces: `createApp(db, config) -> express app` — `config = { rpcUrl, contract }`. 라우트: `GET /`(목록+검색, htmx 부분 렌더), `GET /persons/:slug`(상세), `GET /authors`(작성자 목록). `server.js`는 env(`DB_PATH`, `PORT`, `RPC_URL`, `CONTRACT_ADDRESS`)로 실행하는 진입점
 
-- [ ] **Step 1: 실패하는 테스트 작성**
+- [x] **Step 1: 실패하는 테스트 작성**
 
 `server/test/app.test.js`:
 
@@ -694,12 +694,12 @@ test("작성자 목록이 실명과 자격을 공개한다", async (t) => {
 });
 ```
 
-- [ ] **Step 2: 실패 확인**
+- [x] **Step 2: 실패 확인**
 
 Run: `npm test`
 Expected: app.test.js FAIL — `Cannot find module .../src/app.js`
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `server/src/app.js`:
 
@@ -907,12 +907,12 @@ app.listen(port, () => console.log(`memorial-ledger: http://localhost:${port}`))
 
 참고: `person.ejs`가 참조하는 `/verify.js`는 Task 7에서 만든다. 파일이 없어도 페이지는 렌더되므로 이 태스크의 테스트는 통과한다. `/persons/new/edit` 링크 대상은 Task 6.
 
-- [ ] **Step 4: 통과 확인**
+- [x] **Step 4: 통과 확인**
 
 Run: `npm test`
 Expected: 14 passing
 
-- [ ] **Step 5: 수동 확인**
+- [x] **Step 5: 수동 확인**
 
 ```bash
 cd server && node src/server.js
@@ -920,7 +920,7 @@ cd server && node src/server.js
 
 브라우저에서 `http://localhost:3000` — 빈 목록, 검색창, 작성자 페이지가 뜨는지 확인 후 Ctrl-C.
 
-- [ ] **Step 6: 커밋**
+- [x] **Step 6: 커밋**
 
 ```bash
 git add server/src server/test/app.test.js
@@ -946,7 +946,7 @@ git commit -m "feat: 조회 웹 - 목록/검색(htmx)/상세/작성자 페이지
   - `POST /versions/:id/anchored` — body `{txHash, wallet}` → status를 anchored로 전이. txHash는 `/^0x[0-9a-fA-F]{64}$/` 검증
   - 정본 content 스키마: `{slug, name, category, birth, death, summary, sources:[{label, url}]}` (draft 시점 DB 스냅샷)
 
-- [ ] **Step 1: 실패하는 테스트 추가**
+- [x] **Step 1: 실패하는 테스트 추가**
 
 `server/test/app.test.js`에 append:
 
@@ -1012,12 +1012,12 @@ test("필수 필드가 빠지면 400", async (t) => {
 });
 ```
 
-- [ ] **Step 2: 실패 확인**
+- [x] **Step 2: 실패 확인**
 
 Run: `npm test`
 Expected: 새 3개 FAIL (POST /persons가 404)
 
-- [ ] **Step 3: 라우트 구현**
+- [x] **Step 3: 라우트 구현**
 
 `server/src/app.js` 상단 import에 추가:
 
@@ -1073,7 +1073,7 @@ import { canonicalize } from "../public/canonical.js";
   });
 ```
 
-- [ ] **Step 4: 뷰 작성**
+- [x] **Step 4: 뷰 작성**
 
 `server/src/views/edit.ejs`:
 
@@ -1164,12 +1164,12 @@ btn?.addEventListener("click", async () => {
 });
 ```
 
-- [ ] **Step 5: 통과 확인**
+- [x] **Step 5: 통과 확인**
 
 Run: `npm test`
 Expected: 17 passing
 
-- [ ] **Step 6: 커밋**
+- [x] **Step 6: 커밋**
 
 ```bash
 git add server/src server/public/wallet.js server/test/app.test.js
@@ -1189,7 +1189,7 @@ git commit -m "feat: 작성 플로우 - draft 생성, 앵커 페이지, MetaMask
 - Consumes: Task 4 `latestAnchored`, Task 2 `latest(bytes32)`, Task 3 `canonicalize`
 - Produces: `GET /persons/:slug/latest.json` → `{content, contentHash, txHash}` (앵커된 버전 없으면 404). `verify.js`는 이 JSON을 브라우저에서 재해싱해 온체인 `latest()`와 비교
 
-- [ ] **Step 1: 실패하는 테스트 추가**
+- [x] **Step 1: 실패하는 테스트 추가**
 
 `server/test/app.test.js`에 append:
 
@@ -1214,12 +1214,12 @@ test("latest.json은 앵커된 최신 버전만 준다", async (t) => {
 });
 ```
 
-- [ ] **Step 2: 실패 확인**
+- [x] **Step 2: 실패 확인**
 
 Run: `npm test`
 Expected: 새 1개 FAIL (404 대신 200을 기대하는 분기에서 실패 — 라우트 자체가 없어 모두 404)
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `server/src/app.js`의 `app.get("/persons/:slug", ...)` **위에** 추가 (라우트 매칭 순서 주의):
 
@@ -1269,12 +1269,12 @@ btn?.addEventListener("click", async () => {
 });
 ```
 
-- [ ] **Step 4: 통과 확인**
+- [x] **Step 4: 통과 확인**
 
 Run: `npm test`
 Expected: 18 passing
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add server/src/app.js server/public/verify.js server/test/app.test.js
@@ -1293,7 +1293,7 @@ git commit -m "feat: 체인 검증 - latest.json 엔드포인트와 브라우저
 - Consumes: 지금까지의 전부
 - Produces: 로컬 실행 절차 일체. E2E는 hardhat node를 띄워 "등록 → 앵커 → latest.json → 재해싱 → 온체인 비교"의 전체 루프를 MetaMask 없이 검증
 
-- [ ] **Step 1: 배포 스크립트**
+- [x] **Step 1: 배포 스크립트**
 
 `contracts/scripts/deploy.js`:
 
@@ -1317,7 +1317,7 @@ async function main() {
 main().catch((e) => { console.error(e); process.exit(1); });
 ```
 
-- [ ] **Step 2: 시드 스크립트**
+- [x] **Step 2: 시드 스크립트**
 
 `server/scripts/seed.js`:
 
@@ -1455,7 +1455,7 @@ test("E2E: 등록 → 앵커 → 브라우저 검증 로직", { timeout: 180_000
 Run: `cd server && node --test test/e2e.test.js`
 Expected: 1 passing (2~3분 소요 가능)
 
-- [ ] **Step 5: README 작성**
+- [x] **Step 5: README 작성**
 
 `README.md`:
 

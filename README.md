@@ -26,7 +26,7 @@ CONTRACT_ADDRESS=<배포 주소> node src/server.js   # http://localhost:3000
 ```
 
 기록 작성 테스트: MetaMask에 hardhat 계정 #1
-(`0x59c6...690d`, 로컬 전용 공개 키)을 임포트하고 네트워크를
+(`0x59c6...690d`, 공개된 로컬 전용 테스트 프라이빗 키 — 실제 자산 금지)을 임포트하고 네트워크를
 `http://127.0.0.1:8545` (chainId 31337)로 추가.
 
 ## 테스트
