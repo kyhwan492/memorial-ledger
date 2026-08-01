@@ -1,0 +1,14 @@
+node_modules/
+contracts/artifacts/
+contracts/cache/
+server/data/
+.env
+# orchestrator artifacts
+.cmux/
+.worktrees/
+.done
+.agent-progress
+.agent-scope
+.agent-task.md
+.agent-report-*.md
+.agent-report-*.md.digest
