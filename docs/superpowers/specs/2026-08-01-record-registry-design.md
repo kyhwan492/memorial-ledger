@@ -27,16 +27,22 @@
 - C (보류): IPFS + 체인 — v1 완성 후 저장소 교체 확장으로 남김.
 
 체인: 로컬 Hardhat 노드로 개발 → Ethereum Sepolia 테스트넷 배포.
-툴체인: Hardhat (JS 기반 — 웹·서버·컨트랙트를 모두 JS/TS로 통일).
+툴체인: Hardhat (JS 기반 — 웹·서버·컨트랙트를 모두 JS로 통일).
+웹: Next.js 등 풀스택 프레임워크 대신 Express + htmx 채택 — 조회 중심
+서비스라 서버 렌더링으로 충분하고, 프레임워크 취약점 노출면을 줄인다.
 
 ## 아키텍처
 
 ```
 memorial-ledger/
 ├── contracts/   # Solidity + Hardhat (RecordRegistry 단일 컨트랙트)
-├── web/         # Next.js — 공개 조회 + 작성자 전용 작성 + API
-└── (SQLite)     # 기록 원본, 작성자, 출처
+└── server/      # Node(Express) + SQLite — 서버 렌더링 HTML + htmx
+    └── public/  # JS 섬 2개: verify.js(체인 검증), wallet.js(MetaMask 서명)
 ```
+
+웹은 최대한 단순하게: 프론트 프레임워크·빌드 파이프라인 없이 서버 렌더링 +
+htmx. 브라우저 JS는 서버를 신뢰하지 않아야 하는 두 지점(체인 검증, 지갑 서명)에만
+둔다. 의존성 표면을 줄이는 것이 명시적 목표.
 
 ## 컨트랙트: RecordRegistry
 
@@ -72,12 +78,13 @@ mapping(address => string) authors;               // 지갑 → 공개 프로필
 
 1. **작성자 등록**: 운영자가 실명·자격을 수동 확인 후 `registerAuthor` 호출.
    프로필은 웹에서 공개 열람 가능.
-2. **기록 작성**: 웹 폼 → 서버가 정본 JSON + keccak256 생성 → 작성자가
-   MetaMask로 `anchor()` 서명 → 컨펌 후 DB에 tx_hash 저장, 상태 `anchored`.
-3. **조회**: 지갑 없이 누구나 검색·열람.
-4. **검증**: 인물 페이지 "체인 검증" 버튼 → **브라우저가 직접** 공개 RPC로
-   온체인 해시를 읽어, 서버가 준 JSON을 클라이언트에서 재해싱한 값과 비교.
-   서버를 신뢰하지 않아도 검증되는 것이 이 구조의 존재 이유.
+2. **기록 작성**: 웹 폼(htmx) → 서버가 정본 JSON + keccak256 생성 → 작성자가
+   `wallet.js`(MetaMask)로 `anchor()` 서명 → 컨펌 후 DB에 tx_hash 저장,
+   상태 `anchored`.
+3. **조회**: 지갑 없이 누구나 검색·열람 (서버 렌더링 페이지).
+4. **검증**: 인물 페이지 "체인 검증" 버튼 → `verify.js`가 **브라우저에서 직접**
+   공개 RPC로 온체인 해시를 읽어, 서버가 준 JSON을 클라이언트에서 재해싱한
+   값과 비교. 서버를 신뢰하지 않아도 검증되는 것이 이 구조의 존재 이유.
 5. **수정**: 새 버전 JSON → 새 해시 anchor → 이전 버전 이력도 영구 공개.
 
 ## 에러 처리
