@@ -12,3 +12,10 @@ untracked:
 recent-commits:
   c4c93a1 Add record registry v1 design spec
 
+=== 2026-08-01T14:57:38Z ===
+branch: main
+commit: 122db77
+recent-commits:
+  122db77 Replace Next.js with Express + htmx in design spec
+  c4c93a1 Add record registry v1 design spec
+
