@@ -12,3 +12,4 @@ server/data/
 .agent-task.md
 .agent-report-*.md
 .agent-report-*.md.digest
+.snapshot-diff.log
