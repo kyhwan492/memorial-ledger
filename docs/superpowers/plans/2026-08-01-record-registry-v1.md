@@ -1361,7 +1361,7 @@ console.log(`시드 완료: 인물 ${PERSONS.length}명, 작성자 1명`);
 Run: `cd server && node scripts/seed.js`
 Expected: `시드 완료: 인물 5명, 작성자 1명` (재실행해도 upsert라 안전. authors는 UNIQUE 제약으로 재실행 시 에러 — 무시하고 넘어가도 됨)
 
-- [ ] **Step 3: E2E 테스트 작성**
+- [x] **Step 3: E2E 테스트 작성**
 
 `server/test/e2e.test.js`:
 
@@ -1450,7 +1450,7 @@ test("E2E: 등록 → 앵커 → 브라우저 검증 로직", { timeout: 180_000
 });
 ```
 
-- [ ] **Step 4: E2E 실행**
+- [x] **Step 4: E2E 실행**
 
 Run: `cd server && node --test test/e2e.test.js`
 Expected: 1 passing (2~3분 소요 가능)
@@ -1506,7 +1506,7 @@ SEPOLIA_RPC_URL=<rpc> PRIVATE_KEY=<key> npx hardhat run scripts/deploy.js --netw
 ```
 ```
 
-- [ ] **Step 6: 전체 테스트 + 커밋**
+- [x] **Step 6: 전체 테스트 + 커밋**
 
 Run: `cd contracts && npx hardhat test && cd ../server && npm test`
 Expected: 컨트랙트 8 passing, 서버 19 passing (E2E 포함)
