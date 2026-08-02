@@ -117,6 +117,38 @@ sequenceDiagram
 (미등록 지갑은 anchor가 revert). 서버가 저장하는 `txHash`도 신뢰 근거가 아니라
 편의 정보다. 진실은 항상 검증 절차가 확인한다.
 
+## 편집 거버넌스 (수정 요청 → 심사 → 확정)
+
+기록의 내용이 사실인지는 체인이 못 막는 영역이다. 그 빈틈을 절차로 메운다 —
+논문 피어 리뷰와 같은 구조다.
+
+```
+제보(open) ──작성자 판단──┬─ 단순 정정: 기존처럼 단독 수용/반려
+                          └─ 실질 변경: POST /requests/:id/escalate → in_review
+in_review ── 검토자들이 실명 공개 리뷰(approve|reject|needs_work) ── 정족수 충족 시에만 수용
+accepted ── 작성자가 새 버전으로 종합·앵커 (note에 요청 ID)
+```
+
+```
+change_requests(id, person_slug FK, requester_name, requester_contact, field,
+                proposed, evidence, status 'open'|'in_review'|'accepted'|'rejected',
+                resolver_name, resolution_note, resolved_version_id FK, created_at, resolved_at)
+reviews(id, request_id FK, reviewer_name, verdict 'approve'|'reject'|'needs_work',
+        comment, created_at)
+```
+
+- **정족수**(`reviewStatus`): 검토자별 **최신** 평결 기준 `approve >= 2` AND
+  `reject == 0`. 최신 것만 세므로 검토자가 새 리뷰로 자기 평결을 갱신할 수 있다
+  — 반대가 보완으로 해소되는 경로다.
+- **자기 심사 방지**: 요청의 제안자와 이름이 같은 검토자는 정족수 계산에서 제외된다.
+  서버 로그인이 없으므로 실명 일치 기준이고, v1 원칙 그대로 공개 기록이 책임 장치다.
+- **강제는 서버에서**: `POST /requests/:id/resolve`는 in_review에서 accepted로 갈 때
+  정족수 미충족이면 **403**. 수용 버튼을 숨기는 UI는 편의일 뿐 게이트가 아니다.
+  심사 전환은 open에서만(아니면 409), 리뷰 제출은 in_review에서만(아니면 409).
+- **단순 정정 예외**: open에서의 단독 수용/반려 경로는 그대로 남는다. 오탈자까지
+  심사에 넣으면 절차가 마비된다.
+- 리뷰는 **오프체인 공개 기록**이다. 체인에 오르는 것은 여전히 확정된 기록의 해시뿐.
+
 ## 검증 흐름 (verify.js) — 이 프로젝트의 존재 이유
 
 ```mermaid
