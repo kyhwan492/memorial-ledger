@@ -26,6 +26,7 @@ export function createApp(db, config = {}) {
     rpcUrl: config.rpcUrl ?? "http://127.0.0.1:8545",
     contract: config.contract ?? "",
     donations: config.donations ?? "",
+    tokens: config.tokens ?? [],
   };
 
   app.get("/", (req, res) => {
