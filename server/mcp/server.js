@@ -46,4 +46,17 @@ server.registerTool("submit_change_request", {
   },
 }, async (args) => json(h.submitChangeRequest(db, args)));
 
+server.registerTool("get_change_request", {
+  description: "수정 요청 상세 — 요청 내용, 리뷰 이력(실명·평결·의견), 정족수 현황.",
+  inputSchema: { id: z.number() },
+}, async ({ id }) => json(h.getRequestDetail(db, id)));
+
+server.registerTool("submit_review", {
+  description: "심사 중(in_review)인 수정 요청에 리뷰를 제출한다. 실명·평결·의견이 모두 필수이며 공개된다.",
+  inputSchema: {
+    requestId: z.number(), reviewerName: z.string(),
+    verdict: z.enum(["approve", "reject", "needs_work"]), comment: z.string(),
+  },
+}, async (args) => json(h.submitReview(db, args)));
+
 await server.connect(new StdioServerTransport());

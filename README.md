@@ -53,7 +53,8 @@ env: `DB_PATH`(기본 `data/ledger.db`, 서버와 같은 DB) · `RPC_URL`(기본
 `CONTRACT_ADDRESS`(RecordRegistry 주소 — `verify_record`에만 필요).
 
 도구: `search_persons` · `get_person` · `verify_record` · `list_change_requests` ·
-`submit_change_request`. `verify_record`는 **서버 측** 재해싱 결과이므로 서버를 신뢰하지 않는
+`submit_change_request` · `get_change_request`(리뷰 이력·정족수 포함 상세) ·
+`submit_review`(심사 중인 요청에 평결 제출). `verify_record`는 **서버 측** 재해싱 결과이므로 서버를 신뢰하지 않는
 독립 검증은 웹 브라우저의 검증 버튼을 쓴다.
 
 ## Sepolia 배포
