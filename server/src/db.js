@@ -48,6 +48,14 @@ CREATE TABLE IF NOT EXISTS change_requests (
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   resolved_at TEXT
 );
+CREATE TABLE IF NOT EXISTS reviews (
+  id INTEGER PRIMARY KEY,
+  request_id INTEGER NOT NULL REFERENCES change_requests(id),
+  reviewer_name TEXT NOT NULL,
+  verdict TEXT NOT NULL CHECK (verdict IN ('approve','reject','needs_work')),
+  comment TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `;
 
 export function openDb(path = ":memory:") {
@@ -157,7 +165,7 @@ export function resolveChangeRequest(db, { id, status, resolverName, note, versi
     UPDATE change_requests
     SET status = ?, resolver_name = ?, resolution_note = ?, resolved_version_id = ?,
         resolved_at = datetime('now')
-    WHERE id = ? AND status = 'open'
+    WHERE id = ? AND status IN ('open','in_review')
   `).run(status, resolverName, note ?? "", versionId ?? null, id);
 }
 
@@ -169,4 +177,32 @@ export function chainIndexOf(db, versionId) {
     "SELECT COUNT(*) AS n FROM record_versions WHERE person_slug = ? AND status = 'anchored' AND id < ?"
   ).get(v.person_slug, versionId);
   return Number(n);
+}
+
+export function addReview(db, { requestId, reviewerName, verdict, comment }) {
+  const r = db.prepare(
+    "INSERT INTO reviews (request_id, reviewer_name, verdict, comment) VALUES (?, ?, ?, ?)"
+  ).run(requestId, reviewerName, verdict, comment);
+  return Number(r.lastInsertRowid);
+}
+
+export function listReviews(db, requestId) {
+  return db.prepare("SELECT * FROM reviews WHERE request_id = ? ORDER BY id").all(requestId);
+}
+
+// 정족수: 제안자를 제외한 검토자별 '최신' 평결 기준 approve>=2 AND reject==0
+export function reviewStatus(db, requestId) {
+  const req = db.prepare("SELECT * FROM change_requests WHERE id = ?").get(requestId);
+  const latest = db.prepare(`
+    SELECT r.reviewer_name, r.verdict FROM reviews r
+    JOIN (SELECT reviewer_name, MAX(id) AS mid FROM reviews WHERE request_id = ? GROUP BY reviewer_name) m
+      ON r.id = m.mid
+  `).all(requestId).filter((r) => !req || r.reviewer_name !== req.requester_name);
+  const approvals = latest.filter((r) => r.verdict === "approve").length;
+  const rejects = latest.filter((r) => r.verdict === "reject").length;
+  return { approvals, rejects, passed: approvals >= 2 && rejects === 0 };
+}
+
+export function escalateRequest(db, id) {
+  db.prepare("UPDATE change_requests SET status = 'in_review' WHERE id = ? AND status = 'open'").run(id);
 }

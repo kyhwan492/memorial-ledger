@@ -5,6 +5,7 @@ import {
   createDraft, markAnchored, listVersions, latestAnchored,
   addAuthor, getAuthor, listAuthors,
   addChangeRequest, getChangeRequest, listChangeRequests, resolveChangeRequest, chainIndexOf,
+  addReview, listReviews, reviewStatus, escalateRequest,
 } from "../src/db.js";
 
 function seedPerson(db) {
@@ -90,4 +91,25 @@ test("chainIndexOf는 앵커 순서를 반환한다", () => {
   assert.equal(chainIndexOf(db, a), 0);
   assert.equal(chainIndexOf(db, c), 1);  // b는 draft라 건너뜀
   assert.equal(chainIndexOf(db, b), null);
+});
+
+test("리뷰 정족수: 최신 평결 기준, 제안자 제외", () => {
+  const db = openDb();
+  seedPerson(db);
+  const id = addChangeRequest(db, {
+    personSlug: "kim-gu", requesterName: "박제보", contact: "b@e.c",
+    field: "summary", proposed: "x", evidence: "y",
+  });
+  escalateRequest(db, id);
+  assert.equal(getChangeRequest(db, id).status, "in_review");
+  addReview(db, { requestId: id, reviewerName: "홍역사", verdict: "approve", comment: "사료 일치" });
+  addReview(db, { requestId: id, reviewerName: "박제보", verdict: "approve", comment: "셀프" }); // 제안자 — 제외
+  assert.equal(reviewStatus(db, id).passed, false);
+  addReview(db, { requestId: id, reviewerName: "김검토", verdict: "reject", comment: "근거 부족" });
+  assert.deepEqual(reviewStatus(db, id), { approvals: 1, rejects: 1, passed: false });
+  addReview(db, { requestId: id, reviewerName: "김검토", verdict: "approve", comment: "보완 확인" }); // 평결 갱신
+  assert.deepEqual(reviewStatus(db, id), { approvals: 2, rejects: 0, passed: true });
+  assert.equal(listReviews(db, id).length, 4);
+  resolveChangeRequest(db, { id, status: "accepted", resolverName: "홍역사", note: "반영" });
+  assert.equal(getChangeRequest(db, id).status, "accepted"); // in_review에서도 처리 가능
 });
