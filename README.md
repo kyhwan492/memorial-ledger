@@ -37,6 +37,25 @@ cd contracts && npx hardhat test   # 컨트랙트
 cd server && npm test              # 서버 단위 + E2E
 ```
 
+## MCP 서버
+
+AI 도구(Claude 등)가 원장을 조회·검증하고 수정 요청을 제출할 수 있는 stdio MCP 서버.
+
+```bash
+claude mcp add memorial-ledger \
+  --env DB_PATH=<repo>/server/data/ledger.db \
+  --env RPC_URL=http://127.0.0.1:8545 \
+  --env CONTRACT_ADDRESS=<배포 주소> \
+  -- node <repo>/server/mcp/server.js
+```
+
+env: `DB_PATH`(기본 `data/ledger.db`, 서버와 같은 DB) · `RPC_URL`(기본 `http://127.0.0.1:8545`) ·
+`CONTRACT_ADDRESS`(RecordRegistry 주소 — `verify_record`에만 필요).
+
+도구: `search_persons` · `get_person` · `verify_record` · `list_change_requests` ·
+`submit_change_request`. `verify_record`는 **서버 측** 재해싱 결과이므로 서버를 신뢰하지 않는
+독립 검증은 웹 브라우저의 검증 버튼을 쓴다.
+
 ## Sepolia 배포
 
 ```bash
