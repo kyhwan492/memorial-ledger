@@ -25,6 +25,7 @@ export function createApp(db, config = {}) {
   const chain = {
     rpcUrl: config.rpcUrl ?? "http://127.0.0.1:8545",
     contract: config.contract ?? "",
+    donations: config.donations ?? "",
   };
 
   app.get("/", (req, res) => {
@@ -53,6 +54,7 @@ export function createApp(db, config = {}) {
     if (!person) return res.status(404).send("인물을 찾을 수 없습니다");
     res.render("person", {
       person, CATEGORIES, chain,
+      personIdHex: ethers.id(person.slug),
       sources: q.listSources(db, person.slug),
       versions: q.listVersions(db, person.slug),
     });
