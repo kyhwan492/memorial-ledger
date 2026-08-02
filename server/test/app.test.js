@@ -85,7 +85,7 @@ test("anchored 콜백이 상태를 전이시키고, 잘못된 txHash는 거부�
   const { base, db } = makeServer(t);
   const body = new URLSearchParams({
     slug: "kim-gu", name: "김구", category: "independence",
-    birth: "1876", death: "1949", summary: "대한민국 임시정부 주석",
+    birth: "1876", death: "1949", summary: "대한민국 임시정부 주석", note: "테스트 수정",
   });
   await fetch(base + "/persons", { method: "POST", body, redirect: "manual" });
   const [draft] = listVersions(db, "kim-gu");
@@ -204,4 +204,23 @@ test("수정 요청 제출·공개 목록·처리", async (t) => {
     body: new URLSearchParams({ status: "rejected", resolverName: "홍역사", note: "근거 불충분" }) });
   const detail = await (await fetch(`${base}/requests/${req0.id}`)).text();
   assert.match(detail, /근거 불충분/);
+});
+
+test("기존 인물 수정에 note 없으면 400, 잘못된 반영 버전은 400, 재처리는 409", async (t) => {
+  const { base, db } = makeServer(t);
+  const noNote = await fetch(base + "/persons", { method: "POST",
+    body: new URLSearchParams({ slug: "kim-gu", name: "김구", category: "independence" }) });
+  assert.equal(noNote.status, 400);
+  await fetch(base + "/requests", { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ person: "kim-gu", requesterName: "박제보", contact: "b@e.c",
+      field: "summary", proposed: "x", evidence: "y" }) });
+  const [r] = listChangeRequests(db, {});
+  const badVid = await fetch(`${base}/requests/${r.id}/resolve`, { method: "POST",
+    body: new URLSearchParams({ status: "accepted", resolverName: "홍역사", versionId: "9999" }) });
+  assert.equal(badVid.status, 400);
+  await fetch(`${base}/requests/${r.id}/resolve`, { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ status: "rejected", resolverName: "홍역사", note: "근거 불충분" }) });
+  const again = await fetch(`${base}/requests/${r.id}/resolve`, { method: "POST",
+    body: new URLSearchParams({ status: "accepted", resolverName: "홍역사" }) });
+  assert.equal(again.status, 409);
 });

@@ -84,6 +84,10 @@ export function createApp(db, config = {}) {
     if (!slug || !name || !CATEGORIES[category]) {
       return res.status(400).send("slug, 이름, 분류는 필수입니다");
     }
+    // 기존 인물 수정은 변경 사유가 해시에 영구히 남는다 — 서버에서도 강제
+    if (q.getPerson(db, slug) && !note) {
+      return res.status(400).send("기존 기록 수정에는 변경 사유(note)가 필수입니다");
+    }
     q.upsertPerson(db, { slug, name, category, birth, death, summary });
     const content = {
       slug, name, category,
@@ -175,14 +179,23 @@ export function createApp(db, config = {}) {
   app.post("/requests/:id/resolve", (req, res) => {
     const request = q.getChangeRequest(db, req.params.id);
     if (!request) return res.status(404).send("요청을 찾을 수 없습니다");
+    if (request.status !== "open") return res.status(409).send("이미 처리된 요청입니다");
     const { status, resolverName, note, versionId } = req.body;
     if (!["accepted", "rejected"].includes(status) || !resolverName) {
       return res.status(400).send("처리 상태와 처리자 이름은 필수입니다");
     }
     if (status === "rejected" && !note) return res.status(400).send("반려 사유는 필수입니다");
+    let vid = null;
+    if (versionId) {
+      const v = db.prepare(
+        "SELECT id FROM record_versions WHERE id = ? AND person_slug = ?"
+      ).get(Number(versionId) || 0, request.person_slug);
+      if (!v) return res.status(400).send("반영 버전이 해당 인물에 존재하지 않습니다");
+      vid = v.id;
+    }
     q.resolveChangeRequest(db, {
       id: Number(req.params.id), status, resolverName, note,
-      versionId: versionId ? Number(versionId) : null,
+      versionId: vid,
     });
     res.redirect(`/requests/${req.params.id}`);
   });

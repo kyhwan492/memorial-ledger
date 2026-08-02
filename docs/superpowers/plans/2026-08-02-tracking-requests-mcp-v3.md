@@ -29,7 +29,7 @@
   - `GET /requests?status=` 목록, `GET /requests/new?person=slug` 폼, `POST /requests` (필수: person, requesterName, contact, field, proposed, evidence → 400), `GET /requests/:id` 상세, `POST /requests/:id/resolve` (status accepted|rejected, resolverName 필수, rejected면 note 필수, accepted면 versionId 선택)
 - content 스키마에 `note` 추가: POST /persons가 `req.body.note`를 content에 포함 (없으면 "최초 등록"). edit.ejs에 note 입력(기존 인물 수정 시 required)
 
-- [ ] **Step 1: 실패하는 테스트 추가** — app.test.js append (실제 코드):
+- [x] **Step 1: 실패하는 테스트 추가** — app.test.js append (실제 코드):
 
 ```js
 test("note가 content에 포함되어 해시에 반영된다", async (t) => {
@@ -94,12 +94,12 @@ test("수정 요청 제출·공개 목록·처리", async (t) => {
 
 필요 import 추가: `createDraft`, `listChangeRequests` (이미 있는 import 문에 병합).
 
-- [ ] **Step 2: 실패 확인** — `cd server && npm test` → 신규 4개 FAIL
-- [ ] **Step 3: 라우트 구현** — app.js. diff 계산은 라우트 안 15줄 이내: 두 content를 JSON.parse해 키 합집합 순회, `{key, before, after, changed}` 배열 생성(sources는 JSON.stringify 비교). `/versions/:id.json`은 `/versions/:id/...` 라우트들보다 위에 배치.
-- [ ] **Step 4: 뷰** — 기존 EJS 컨벤션(head partial, nav, 이스케이프 `<%= %>`) 그대로. person.ejs: 버전 이력 테이블에 각 anchored 행 diff 링크 + "검증" 버튼(`data-chain-index`, `data-version-id`), 상단에 "수정 요청하기" 링크와 open 요청 수. edit.ejs: note 입력. requests 3종 뷰. nav에 `/requests` 추가(전체 뷰 nav 일괄).
-- [ ] **Step 5: verify.js 확장** — 기존 최신 검증 유지 + 버전별: 클릭된 버튼의 `data-version-id`로 `/versions/:id.json` fetch → 재해싱 → `getVersion(personId, chainIndex)`와 비교. ABI에 `getVersion` 추가. 이벤트 위임(버전 버튼 여러 개).
-- [ ] **Step 6: 통과 확인** — `npm test` → 32 passing
-- [ ] **Step 7: 커밋**
+- [x] **Step 2: 실패 확인** — `cd server && npm test` → 신규 4개 FAIL
+- [x] **Step 3: 라우트 구현** — app.js. diff 계산은 라우트 안 15줄 이내: 두 content를 JSON.parse해 키 합집합 순회, `{key, before, after, changed}` 배열 생성(sources는 JSON.stringify 비교). `/versions/:id.json`은 `/versions/:id/...` 라우트들보다 위에 배치.
+- [x] **Step 4: 뷰** — 기존 EJS 컨벤션(head partial, nav, 이스케이프 `<%= %>`) 그대로. person.ejs: 버전 이력 테이블에 각 anchored 행 diff 링크 + "검증" 버튼(`data-chain-index`, `data-version-id`), 상단에 "수정 요청하기" 링크와 open 요청 수. edit.ejs: note 입력. requests 3종 뷰. nav에 `/requests` 추가(전체 뷰 nav 일괄).
+- [x] **Step 5: verify.js 확장** — 기존 최신 검증 유지 + 버전별: 클릭된 버튼의 `data-version-id`로 `/versions/:id.json` fetch → 재해싱 → `getVersion(personId, chainIndex)`와 비교. ABI에 `getVersion` 추가. 이벤트 위임(버전 버튼 여러 개).
+- [x] **Step 6: 통과 확인** — `npm test` → 32 passing
+- [x] **Step 7: 커밋**
 
 ---
 
@@ -121,7 +121,7 @@ test("수정 요청 제출·공개 목록·처리", async (t) => {
   - `listRequests(db, {status})` → rows
 - `server.js`: stdio MCP 서버, 도구 5개 등록, env `DB_PATH`/`RPC_URL`/`CONTRACT_ADDRESS`. SDK 사용법은 `@modelcontextprotocol/sdk` README(설치 후 node_modules 내) 참조 — McpServer + StdioServerTransport + zod 스키마
 
-- [ ] **Step 1: 실패하는 테스트 작성** — mcp-handlers.test.js (실제 코드):
+- [x] **Step 1: 실패하는 테스트 작성** — mcp-handlers.test.js (실제 코드):
 
 ```js
 import test from "node:test";
@@ -173,9 +173,9 @@ test("verifyRecord가 가짜 체인과 대조한다", async () => {
 
 주: verifyRecord의 chainDeps는 `{contract}`(latest/getVersion 메서드를 가진 객체)로 주입 — server.js에서만 실제 ethers.Contract 생성.
 
-- [ ] **Step 2: 실패 확인** — `npm test` → 신규 3개 FAIL (모듈 없음)
-- [ ] **Step 3: handlers.js 구현** — 순수 함수 5개. verifyRecord: versionId 주면 `chainIndexOf`+`getVersion`, 없으면 `latestAnchored`+`latest`. 앵커 버전 없으면 `{verified:false, error:"앵커된 버전 없음"}`.
-- [ ] **Step 4: SDK 설치 + server.js** — `npm i @modelcontextprotocol/sdk zod`. McpServer에 도구 5개(zod 입력 스키마, description 한국어), StdioServerTransport 연결. 실행 확인: `echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}' | node mcp/server.js` 가 JSON 응답을 내면 OK.
-- [ ] **Step 5: README에 MCP 섹션** — 등록 예시 포함: `claude mcp add memorial-ledger -- node <repo>/server/mcp/server.js` + env 설명.
-- [ ] **Step 6: 통과 확인** — `npm test` 그린 (31 이상)
-- [ ] **Step 7: 커밋**
+- [x] **Step 2: 실패 확인** — `npm test` → 신규 3개 FAIL (모듈 없음)
+- [x] **Step 3: handlers.js 구현** — 순수 함수 5개. verifyRecord: versionId 주면 `chainIndexOf`+`getVersion`, 없으면 `latestAnchored`+`latest`. 앵커 버전 없으면 `{verified:false, error:"앵커된 버전 없음"}`.
+- [x] **Step 4: SDK 설치 + server.js** — `npm i @modelcontextprotocol/sdk zod`. McpServer에 도구 5개(zod 입력 스키마, description 한국어), StdioServerTransport 연결. 실행 확인: `echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}' | node mcp/server.js` 가 JSON 응답을 내면 OK.
+- [x] **Step 5: README에 MCP 섹션** — 등록 예시 포함: `claude mcp add memorial-ledger -- node <repo>/server/mcp/server.js` + env 설명.
+- [x] **Step 6: 통과 확인** — `npm test` 그린 (31 이상)
+- [x] **Step 7: 커밋**
