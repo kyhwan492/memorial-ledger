@@ -140,3 +140,9 @@ test("소개 페이지가 검증 원리를 설명한다", async (t) => {
   assert.match(html, /불변성/);
   assert.match(html, /진실성/);
 });
+
+test("인물 페이지에 후원 섹션이 있다", async (t) => {
+  const { base } = makeServer(t);
+  const html = await (await fetch(base + "/persons/kim-gu")).text();
+  assert.match(html, /donate-section/);
+});

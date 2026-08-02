@@ -21,6 +21,18 @@
         data-contract="<%= chain.contract %>">최신 기록 검증</button>
 <p id="verify-result"></p>
 
+<h2>후원</h2>
+<div id="donate-section"
+     data-donations="<%= chain.donations %>"
+     data-person-id="<%= personIdHex %>"
+     data-rpc-url="<%= chain.rpcUrl %>">
+  <p id="donate-status">후원 정보를 불러오는 중…</p>
+  <p><input id="donate-amount" type="number" step="0.001" min="0" placeholder="ETH">
+     <button id="donate-btn">MetaMask로 후원</button></p>
+  <ul id="donate-history"></ul>
+</div>
+<script type="module" src="/donate.js"></script>
+
 <h2>버전 이력</h2>
 <table>
   <thead><tr><th>버전</th><th>해시</th><th>상태</th><th>tx</th><th>등록 시각</th></tr></thead>
