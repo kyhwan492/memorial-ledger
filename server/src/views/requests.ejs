@@ -8,6 +8,7 @@
 <p>
   <a href="/requests">전체</a>
   <a href="/requests?status=open">미처리</a>
+  <a href="/requests?status=in_review">심사 중</a>
   <a href="/requests?status=accepted">수용</a>
   <a href="/requests?status=rejected">반려</a>
   <% if (status) { %>· 현재 필터: <%= status %><% } %>

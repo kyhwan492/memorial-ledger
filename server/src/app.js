@@ -173,18 +173,49 @@ export function createApp(db, config = {}) {
   app.get("/requests/:id", (req, res) => {
     const request = q.getChangeRequest(db, req.params.id);
     if (!request) return res.status(404).send("요청을 찾을 수 없습니다");
-    res.render("request", { request, person: q.getPerson(db, request.person_slug) });
+    res.render("request", {
+      request, person: q.getPerson(db, request.person_slug),
+      reviews: q.listReviews(db, request.id),
+      quorum: q.reviewStatus(db, request.id),
+    });
+  });
+
+  app.post("/requests/:id/escalate", (req, res) => {
+    const request = q.getChangeRequest(db, req.params.id);
+    if (!request) return res.status(404).send("요청을 찾을 수 없습니다");
+    if (request.status !== "open") return res.status(409).send("미처리 요청만 심사로 전환할 수 있습니다");
+    q.escalateRequest(db, request.id);
+    res.redirect(`/requests/${request.id}`);
+  });
+
+  app.post("/requests/:id/reviews", (req, res) => {
+    const request = q.getChangeRequest(db, req.params.id);
+    if (!request) return res.status(404).send("요청을 찾을 수 없습니다");
+    if (request.status !== "in_review") return res.status(409).send("심사 중인 요청만 리뷰할 수 있습니다");
+    const { reviewerName, verdict, comment } = req.body;
+    if (!reviewerName || !comment || !["approve", "reject", "needs_work"].includes(verdict)) {
+      return res.status(400).send("검토자 이름, 평결, 의견은 모두 필수입니다");
+    }
+    q.addReview(db, { requestId: request.id, reviewerName, verdict, comment });
+    res.redirect(`/requests/${request.id}`);
   });
 
   app.post("/requests/:id/resolve", (req, res) => {
     const request = q.getChangeRequest(db, req.params.id);
     if (!request) return res.status(404).send("요청을 찾을 수 없습니다");
-    if (request.status !== "open") return res.status(409).send("이미 처리된 요청입니다");
+    if (!["open", "in_review"].includes(request.status)) {
+      return res.status(409).send("이미 처리된 요청입니다");
+    }
     const { status, resolverName, note, versionId } = req.body;
     if (!["accepted", "rejected"].includes(status) || !resolverName) {
       return res.status(400).send("처리 상태와 처리자 이름은 필수입니다");
     }
     if (status === "rejected" && !note) return res.status(400).send("반려 사유는 필수입니다");
+    // 심사에 올라간 요청의 수용은 정족수(승인 2·반대 0)를 넘어야 한다 — UI뿐 아니라 서버에서 강제
+    if (request.status === "in_review" && status === "accepted"
+        && !q.reviewStatus(db, request.id).passed) {
+      return res.status(403).send("정족수 미충족 — 승인 2명 이상, 반대 0일 때만 수용할 수 있습니다");
+    }
     let vid = null;
     if (versionId) {
       const v = db.prepare(

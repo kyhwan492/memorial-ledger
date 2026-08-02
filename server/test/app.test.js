@@ -224,3 +224,49 @@ test("기존 인물 수정에 note 없으면 400, 잘못된 반영 버전은 400
     body: new URLSearchParams({ status: "accepted", resolverName: "홍역사" }) });
   assert.equal(again.status, 409);
 });
+
+test("심사 전환과 리뷰 제출, 정족수 강제", async (t) => {
+  const { base, db } = makeServer(t);
+  await fetch(base + "/requests", { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ person: "kim-gu", requesterName: "박제보", contact: "b@e.c",
+      field: "summary", proposed: "x", evidence: "y" }) });
+  const [r] = listChangeRequests(db, {});
+  // open 상태에서 리뷰 제출은 409
+  const early = await fetch(`${base}/requests/${r.id}/reviews`, { method: "POST",
+    body: new URLSearchParams({ reviewerName: "홍역사", verdict: "approve", comment: "ok" }) });
+  assert.equal(early.status, 409);
+  // 심사 전환
+  await fetch(`${base}/requests/${r.id}/escalate`, { method: "POST", redirect: "manual" });
+  // 필수값 누락 400
+  const bad = await fetch(`${base}/requests/${r.id}/reviews`, { method: "POST",
+    body: new URLSearchParams({ reviewerName: "홍역사", verdict: "approve" }) });
+  assert.equal(bad.status, 400);
+  // 정족수 미충족 상태에서 수용 시도 → 403
+  await fetch(`${base}/requests/${r.id}/reviews`, { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ reviewerName: "홍역사", verdict: "approve", comment: "사료 일치" }) });
+  const deny = await fetch(`${base}/requests/${r.id}/resolve`, { method: "POST",
+    body: new URLSearchParams({ status: "accepted", resolverName: "홍역사" }) });
+  assert.equal(deny.status, 403);
+  // 두 번째 승인 후 수용 성공
+  await fetch(`${base}/requests/${r.id}/reviews`, { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ reviewerName: "김검토", verdict: "approve", comment: "근거 확인" }) });
+  const ok = await fetch(`${base}/requests/${r.id}/resolve`, { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ status: "accepted", resolverName: "홍역사" }) });
+  assert.equal(ok.status, 302);
+  const html = await (await fetch(`${base}/requests/${r.id}`)).text();
+  assert.match(html, /사료 일치/);
+  assert.match(html, /김검토/);
+});
+
+test("심사 전환은 open에서만, 요청 목록에 in_review 필터", async (t) => {
+  const { base, db } = makeServer(t);
+  await fetch(base + "/requests", { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ person: "kim-gu", requesterName: "박제보", contact: "b@e.c",
+      field: "birth", proposed: "z", evidence: "w" }) });
+  const [r] = listChangeRequests(db, {});
+  await fetch(`${base}/requests/${r.id}/escalate`, { method: "POST", redirect: "manual" });
+  const again = await fetch(`${base}/requests/${r.id}/escalate`, { method: "POST" });
+  assert.equal(again.status, 409);
+  const list = await (await fetch(base + "/requests?status=in_review")).text();
+  assert.match(list, /박제보/);
+});
