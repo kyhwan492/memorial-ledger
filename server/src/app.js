@@ -1,4 +1,5 @@
 import express from "express";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { ethers } from "ethers";
@@ -29,14 +30,40 @@ export function createApp(db, config = {}) {
     tokens: config.tokens ?? [],
   };
 
+  // 이달의 독립운동가: fetch-monthly.js 산출물 [{year, month, name, mngNo, summary}].
+  // 요청 시마다 읽는다 — 파일이 없거나 깨졌으면 섹션을 그리지 않는다.
+  const monthlyPath = config.monthlyPath ?? path.join(DIR, "..", "data", "monthly.json");
+  function monthlyOfThisMonth() {
+    let list;
+    try {
+      list = JSON.parse(readFileSync(monthlyPath, "utf8"));
+    } catch {
+      return null;
+    }
+    if (!Array.isArray(list)) return null;
+    const now = new Date();
+    const hit = list.find(
+      (m) => Number(m.year) === now.getFullYear() && Number(m.month) === now.getMonth() + 1
+    );
+    if (!hit) return null;
+    const slug = `gonghun-${hit.mngNo}`;
+    return { ...hit, slug: hit.mngNo && q.getPerson(db, slug) ? slug : null };
+  }
+
   app.get("/", (req, res) => {
-    const persons = q.listPersons(db, { q: req.query.q, category: req.query.category });
+    const persons = q.listPersons(db, {
+      q: req.query.q, category: req.query.category,
+      hunkuk: req.query.hunkuk, workoutAffil: req.query.workoutAffil,
+    });
     if (req.get("HX-Request")) {
       return res.render("partials/person-rows", { persons, CATEGORIES });
     }
     res.render("index", {
       persons, CATEGORIES,
       query: req.query.q ?? "", category: req.query.category ?? "",
+      hunkuk: req.query.hunkuk ?? "", workoutAffil: req.query.workoutAffil ?? "",
+      filters: q.listFilterValues(db),
+      monthly: monthlyOfThisMonth(),
     });
   });
 
@@ -81,7 +108,8 @@ export function createApp(db, config = {}) {
   });
 
   app.post("/persons", (req, res) => {
-    const { slug, name, category, birth, death, summary, note } = req.body;
+    const { slug, name, category, birth, death, summary, note,
+      hunkuk, workoutAffil, judgeYear, alias, sex } = req.body;
     if (!slug || !name || !CATEGORIES[category]) {
       return res.status(400).send("slug, 이름, 분류는 필수입니다");
     }
@@ -89,13 +117,18 @@ export function createApp(db, config = {}) {
     if (q.getPerson(db, slug) && !note) {
       return res.status(400).send("기존 기록 수정에는 변경 사유(note)가 필수입니다");
     }
-    q.upsertPerson(db, { slug, name, category, birth, death, summary });
+    q.upsertPerson(db, { slug, name, category, birth, death, summary,
+      hunkuk, workoutAffil, judgeYear, alias, sex });
     const content = {
       slug, name, category,
       birth: birth ?? "", death: death ?? "", summary: summary ?? "",
       note: note || "최초 등록",
       sources: q.listSources(db, slug).map((s) => ({ label: s.label, url: s.url })),
     };
+    // 값이 있는 새 필드만 정본에 — 빈 필드는 기존 앵커 버전과의 diff 잡음이 된다
+    for (const [k, v] of Object.entries({ hunkuk, workoutAffil, judgeYear, alias, sex })) {
+      if (v) content[k] = v;
+    }
     const canonical = canonicalize(content);
     const contentHash = ethers.keccak256(ethers.toUtf8Bytes(canonical));
     const versionId = q.createDraft(db, { personSlug: slug, contentJson: canonical, contentHash });
