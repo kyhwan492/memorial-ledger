@@ -97,7 +97,7 @@ export function getPerson(db, slug) {
   return db.prepare("SELECT * FROM persons WHERE slug = ?").get(slug);
 }
 
-export function listPersons(db, { q, category, hunkuk, workoutAffil } = {}) {
+export function listPersons(db, { q, category, hunkuk, workoutAffil, limit, offset } = {}) {
   let sql = "SELECT * FROM persons WHERE 1=1";
   const params = [];
   if (q) { sql += " AND name LIKE ?"; params.push(`%${q}%`); }
@@ -105,6 +105,7 @@ export function listPersons(db, { q, category, hunkuk, workoutAffil } = {}) {
   if (hunkuk) { sql += " AND hunkuk = ?"; params.push(hunkuk); }
   if (workoutAffil) { sql += " AND workout_affil = ?"; params.push(workoutAffil); }
   sql += " ORDER BY name";
+  if (limit) { sql += " LIMIT ? OFFSET ?"; params.push(limit, offset ?? 0); }
   return db.prepare(sql).all(...params);
 }
 
@@ -230,4 +231,14 @@ export function listFilterValues(db) {
   const vals = (col) =>
     db.prepare(`SELECT DISTINCT ${col} AS v FROM persons WHERE ${col} != '' ORDER BY v`).all().map((r) => r.v);
   return { hunkuks: vals("hunkuk"), affils: vals("workout_affil") };
+}
+
+export function countPersons(db, { q, category, hunkuk, workoutAffil } = {}) {
+  let sql = "SELECT COUNT(*) AS n FROM persons WHERE 1=1";
+  const params = [];
+  if (q) { sql += " AND name LIKE ?"; params.push(`%${q}%`); }
+  if (category) { sql += " AND category = ?"; params.push(category); }
+  if (hunkuk) { sql += " AND hunkuk = ?"; params.push(hunkuk); }
+  if (workoutAffil) { sql += " AND workout_affil = ?"; params.push(workoutAffil); }
+  return Number(db.prepare(sql).get(...params).n);
 }

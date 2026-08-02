@@ -8,5 +8,12 @@
 </tr>
 <% } %>
 <% if (persons.length === 0) { %>
-<tr><td colspan="5">결과가 없습니다</td></tr>
+<tr><td colspan="5" class="empty">결과가 없습니다</td></tr>
+<% } %>
+<% if (paging && paging.pages > 1) { %>
+<tr class="pager"><td colspan="5">
+  <% if (paging.page > 1) { %><a href="/?<%= paging.qs %>&page=<%= paging.page - 1 %>">← 이전</a><% } %>
+  <span><%= paging.page %> / <%= paging.pages %> 페이지 · 총 <%= paging.total.toLocaleString("ko-KR") %>명</span>
+  <% if (paging.page < paging.pages) { %><a href="/?<%= paging.qs %>&page=<%= paging.page + 1 %>">다음 →</a><% } %>
+</td></tr>
 <% } %>

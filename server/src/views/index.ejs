@@ -38,7 +38,7 @@
 </form>
 <table>
   <thead><tr><th>이름</th><th>분류</th><th>생몰</th><th>훈격</th><th>운동계열</th></tr></thead>
-  <tbody id="rows"><%- include("partials/person-rows", { persons, CATEGORIES }) %></tbody>
+  <tbody id="rows"><%- include("partials/person-rows", { persons, CATEGORIES, paging }) %></tbody>
 </table>
 </body>
 </html>

@@ -13,3 +13,4 @@ server/data/
 .agent-report-*.md
 .agent-report-*.md.digest
 .snapshot-diff.log
+.gstack/

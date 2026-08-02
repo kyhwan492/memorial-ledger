@@ -346,3 +346,16 @@ test("이달의 독립운동가 섹션은 monthly.json이 있고 이번 달 항�
   writeFileSync(file, "깨진 json");
   assert.doesNotMatch(await (await fetch(base + "/")).text(), /이달의 독립운동가/);
 });
+
+test("목록이 페이지네이션된다 (100행 제한 + 페이저)", async (t) => {
+  const { base, db } = makeServer(t);
+  for (let i = 0; i < 105; i++) {
+    upsertPerson(db, { slug: `p-${String(i).padStart(3, "0")}`, name: `인물${i}`,
+      category: "independence", birth: "", death: "", summary: "" });
+  }
+  const html = await (await fetch(base + "/")).text();
+  assert.equal((html.match(/<td><a href="\/persons\//g) || []).length, 100);
+  assert.match(html, /2 페이지/);
+  const page2 = await (await fetch(base + "/?page=2")).text();
+  assert.match(page2, /← 이전/);
+});

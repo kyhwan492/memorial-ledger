@@ -50,16 +50,26 @@ export function createApp(db, config = {}) {
     return { ...hit, slug: hit.mngNo && q.getPerson(db, slug) ? slug : null };
   }
 
+  const PAGE_SIZE = 100;
+
   app.get("/", (req, res) => {
-    const persons = q.listPersons(db, {
+    const filter = {
       q: req.query.q, category: req.query.category,
       hunkuk: req.query.hunkuk, workoutAffil: req.query.workoutAffil,
-    });
+    };
+    const total = q.countPersons(db, filter);
+    const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const page = Math.min(pages, Math.max(1, Number(req.query.page) || 1));
+    const persons = q.listPersons(db, { ...filter, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE });
+    const qs = new URLSearchParams(
+      Object.entries(filter).filter(([, v]) => v)
+    ).toString();
+    const paging = { total, page, pages, qs };
     if (req.get("HX-Request")) {
-      return res.render("partials/person-rows", { persons, CATEGORIES });
+      return res.render("partials/person-rows", { persons, CATEGORIES, paging });
     }
     res.render("index", {
-      persons, CATEGORIES,
+      persons, CATEGORIES, paging,
       query: req.query.q ?? "", category: req.query.category ?? "",
       hunkuk: req.query.hunkuk ?? "", workoutAffil: req.query.workoutAffil ?? "",
       filters: q.listFilterValues(db),
