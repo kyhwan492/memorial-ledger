@@ -33,6 +33,21 @@ CREATE TABLE IF NOT EXISTS record_versions (
   wallet TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS change_requests (
+  id INTEGER PRIMARY KEY,
+  person_slug TEXT NOT NULL REFERENCES persons(slug),
+  requester_name TEXT NOT NULL,
+  requester_contact TEXT NOT NULL,
+  field TEXT NOT NULL,
+  proposed TEXT NOT NULL,
+  evidence TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open',
+  resolver_name TEXT,
+  resolution_note TEXT,
+  resolved_version_id INTEGER REFERENCES record_versions(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  resolved_at TEXT
+);
 `;
 
 export function openDb(path = ":memory:") {
@@ -114,4 +129,44 @@ export function getAuthor(db, id) {
 
 export function listAuthors(db) {
   return db.prepare("SELECT * FROM authors ORDER BY id").all();
+}
+
+export function addChangeRequest(db, { personSlug, requesterName, contact, field, proposed, evidence }) {
+  const r = db.prepare(`
+    INSERT INTO change_requests (person_slug, requester_name, requester_contact, field, proposed, evidence)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(personSlug, requesterName, contact, field, proposed, evidence);
+  return Number(r.lastInsertRowid);
+}
+
+export function getChangeRequest(db, id) {
+  return db.prepare("SELECT * FROM change_requests WHERE id = ?").get(id);
+}
+
+export function listChangeRequests(db, { personSlug, status } = {}) {
+  let sql = "SELECT * FROM change_requests WHERE 1=1";
+  const params = [];
+  if (personSlug) { sql += " AND person_slug = ?"; params.push(personSlug); }
+  if (status) { sql += " AND status = ?"; params.push(status); }
+  sql += " ORDER BY id DESC";
+  return db.prepare(sql).all(...params);
+}
+
+export function resolveChangeRequest(db, { id, status, resolverName, note, versionId }) {
+  db.prepare(`
+    UPDATE change_requests
+    SET status = ?, resolver_name = ?, resolution_note = ?, resolved_version_id = ?,
+        resolved_at = datetime('now')
+    WHERE id = ? AND status = 'open'
+  `).run(status, resolverName, note ?? "", versionId ?? null, id);
+}
+
+// 앵커된 버전의 체인 인덱스 = 같은 인물에서 자기보다 먼저 앵커된 버전 수
+export function chainIndexOf(db, versionId) {
+  const v = db.prepare("SELECT * FROM record_versions WHERE id = ?").get(versionId);
+  if (!v || v.status !== "anchored") return null;
+  const { n } = db.prepare(
+    "SELECT COUNT(*) AS n FROM record_versions WHERE person_slug = ? AND status = 'anchored' AND id < ?"
+  ).get(v.person_slug, versionId);
+  return Number(n);
 }
