@@ -44,14 +44,19 @@ export function submitChangeRequest(db, { personSlug, requesterName, contact, fi
   return { id: q.addChangeRequest(db, { personSlug, requesterName, contact, field, proposed, evidence }) };
 }
 
+// 연락처는 작성자 연락용이지 공개용이 아니다 — 읽기 경로에서 항상 제거
+function redactContact({ requester_contact, ...pub }) {
+  return pub;
+}
+
 export function listRequests(db, { status } = {}) {
-  return q.listChangeRequests(db, { status });
+  return q.listChangeRequests(db, { status }).map(redactContact);
 }
 
 export function getRequestDetail(db, id) {
   const request = q.getChangeRequest(db, id);
   if (!request) return null;
-  return { request, reviews: q.listReviews(db, id), quorum: q.reviewStatus(db, id) };
+  return { request: redactContact(request), reviews: q.listReviews(db, id), quorum: q.reviewStatus(db, id) };
 }
 
 const VERDICTS = ["approve", "reject", "needs_work"];

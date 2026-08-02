@@ -78,3 +78,18 @@ env: `DB_PATH`(기본 `data/ledger.db`, 서버와 같은 DB) · `RPC_URL`(기본
 cd contracts
 SEPOLIA_RPC_URL=<rpc> PRIVATE_KEY=<key> npx hardhat run scripts/deploy.js --network sepolia
 ```
+
+## 데이터 스냅샷 (미러링)
+
+기록 원본은 서버 SQLite에 있지만, 공개 스냅샷이 `data-snapshot/`에 주기적으로
+커밋된다. 이 저장소를 clone하는 것만으로 원본 데이터의 미러가 된다 — 사본이
+조작됐는지는 체인 검증이 가려주므로, 호스팅 주체는 신뢰와 무관하다.
+
+```bash
+cd server
+node scripts/snapshot.js export   # DB → data-snapshot/*.json
+node scripts/snapshot.js import   # data-snapshot/*.json → DB (복원/미러 부트스트랩)
+```
+
+수정 요청의 연락처(`requester_contact`)는 공개용이 아니므로 스냅샷·웹 상세·MCP
+어디에도 노출되지 않는다 (작성자 연락용으로 서버 DB에만 남는다).

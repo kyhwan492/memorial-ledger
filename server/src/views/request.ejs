@@ -7,7 +7,7 @@
 <dl>
   <dt>인물</dt><dd><a href="/persons/<%= request.person_slug %>"><%= person ? person.name : request.person_slug %></a></dd>
   <dt>대상 필드</dt><dd><%= request.field %></dd>
-  <dt>요청자</dt><dd><%= request.requester_name %> (<%= request.requester_contact %>)</dd>
+  <dt>요청자</dt><dd><%= request.requester_name %></dd>
   <dt>제안 내용</dt><dd><%= request.proposed %></dd>
   <dt>근거 출처</dt><dd><%= request.evidence %></dd>
   <dt>요청 시각</dt><dd><%= request.created_at %></dd>
