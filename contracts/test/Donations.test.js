@@ -59,3 +59,39 @@ describe("Donations", function () {
     await expect(d2.connect(donor2).donate(personId, { value: 0 })).to.be.revertedWith("zero amount");
   });
 });
+
+describe("Donations: ERC-20", function () {
+  async function tokenFixture() {
+    const f = await registeredFixture();
+    const token = await ethers.deployContract("TestToken");
+    await token.transfer(f.donor.address, ethers.parseEther("1000"));
+    return { ...f, token };
+  }
+
+  it("토큰 후원이 수혜자에게 직접 전달되고 이벤트·누적이 기록된다", async function () {
+    const { donations, beneficiary, donor, token } = await loadFixture(tokenFixture);
+    const amount = ethers.parseEther("100");
+    await token.connect(donor).approve(await donations.getAddress(), amount * 2n);
+    await expect(donations.connect(donor).donateToken(personId, await token.getAddress(), amount))
+      .to.emit(donations, "DonatedToken")
+      .withArgs(personId, donor.address, await token.getAddress(), amount);
+    expect(await token.balanceOf(beneficiary.address)).to.equal(amount);
+    expect(await token.balanceOf(await donations.getAddress())).to.equal(0n); // 무보관
+    await donations.connect(donor).donateToken(personId, await token.getAddress(), amount);
+    expect(await donations.totalDonatedToken(personId, await token.getAddress())).to.equal(amount * 2n);
+  });
+
+  it("수혜자 미등록/0수량/승인 없음은 거부된다", async function () {
+    const { donations, donor, token } = await loadFixture(tokenFixture);
+    const other = ethers.id("nobody");
+    await expect(
+      donations.connect(donor).donateToken(other, await token.getAddress(), 1n)
+    ).to.be.revertedWith("no beneficiary");
+    await expect(
+      donations.connect(donor).donateToken(personId, await token.getAddress(), 0)
+    ).to.be.revertedWith("zero amount");
+    await expect(
+      donations.connect(donor).donateToken(personId, await token.getAddress(), 1n)
+    ).to.be.reverted; // approve 없음 — SafeERC20 revert
+  });
+});
