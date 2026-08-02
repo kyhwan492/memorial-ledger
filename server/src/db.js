@@ -67,6 +67,7 @@ export function openDb(path = ":memory:") {
   // data/ 는 gitignore 대상이라 클론 직후엔 없다 — 열기 전에 만든다
   if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
+  db.exec("PRAGMA busy_timeout = 5000;"); // 서버·스크립트가 같은 파일을 쓸 때 락 충돌로 즉사하지 않게
   db.exec("PRAGMA foreign_keys = ON;");
   db.exec(SCHEMA);
   // 스키마 진화: 기존 DB에 없는 persons 컬럼을 추가한다 (CREATE IF NOT EXISTS는 ALTER하지 않음)
