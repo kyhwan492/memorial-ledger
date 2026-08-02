@@ -4,7 +4,9 @@ import { createApp } from "./app.js";
 // TOKENS='[{"symbol":"TKRW","address":"0x…","decimals":18}]'
 function parseTokens() {
   try {
-    return JSON.parse(process.env.TOKENS ?? "[]");
+    const parsed = JSON.parse(process.env.TOKENS ?? "[]");
+    if (!Array.isArray(parsed)) throw new Error("배열이 아님");
+    return parsed;
   } catch (e) {
     console.error(`TOKENS 파싱 실패 — 토큰 후원 비활성화: ${e.message}`);
     return [];

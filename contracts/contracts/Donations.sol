@@ -50,6 +50,8 @@ contract Donations {
         address to = beneficiaries[personId];
         require(to != address(0), "no beneficiary");
         require(amount > 0, "zero amount");
+        // ponytail: fee-on-transfer 토큰은 요청 수량 기준으로 과대계상됨 —
+        // 실수령액 회계가 필요해지면 전후 balanceOf 차이로 기록
         totalDonatedToken[personId][token] += amount;
         emit DonatedToken(personId, msg.sender, token, amount);
         IERC20(token).safeTransferFrom(msg.sender, to, amount);

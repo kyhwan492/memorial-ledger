@@ -28,7 +28,7 @@
 - `TestToken` — OZ ERC20("Test KRW", "TKRW"), decimals 18, 생성자에서 배포자에게 1,000,000개 민트
 - deploy.js — TestToken 배포, hardhat 계정 #3(`0x90F7...b906`)에 10,000 TKRW 전송(데모 후원자), 출력에 `TestToken(TKRW): <addr>`와 서버 실행 안내 `TOKENS='[{"symbol":"TKRW","address":"<addr>","decimals":18}]'` 포함. Sepolia에선 TestToken 배포 스킵.
 
-- [ ] **Step 1: 실패하는 테스트 추가** — Donations.test.js append:
+- [x] **Step 1: 실패하는 테스트 추가** — Donations.test.js append:
 
 ```js
 describe("Donations: ERC-20", function () {
@@ -68,8 +68,8 @@ describe("Donations: ERC-20", function () {
 });
 ```
 
-- [ ] **Step 2: 실패 확인** — `cd contracts && npx hardhat test` → TestToken/donateToken 없음 에러
-- [ ] **Step 3: 구현** — `npm i @openzeppelin/contracts`. TestToken.sol:
+- [x] **Step 2: 실패 확인** — `cd contracts && npx hardhat test` → TestToken/donateToken 없음 에러
+- [x] **Step 3: 구현** — `npm i @openzeppelin/contracts`. TestToken.sol:
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -104,9 +104,9 @@ Donations.sol에 추가 (import `SafeERC20`/`IERC20`):
     }
 ```
 
-- [ ] **Step 4: deploy.js 갱신** (TestToken 로컬 배포·분배·TOKENS 안내, Sepolia 스킵 가드)
-- [ ] **Step 5: 통과 확인** — `npx hardhat test` → 14 passing (기존 12 + 2)
-- [ ] **Step 6: 커밋**
+- [x] **Step 4: deploy.js 갱신** (TestToken 로컬 배포·분배·TOKENS 안내, Sepolia 스킵 가드)
+- [x] **Step 5: 통과 확인** — `npx hardhat test` → 14 passing (기존 12 + 2)
+- [x] **Step 6: 커밋**
 
 ---
 
@@ -120,7 +120,7 @@ Donations.sol에 추가 (import `SafeERC20`/`IERC20`):
 - Consumes: Task C의 `donateToken`/`totalDonatedToken`/`DonatedToken`(위 Interfaces 블록 — 코드가 아직 없어도 이 시그니처로 작성), ERC-20 표준 `approve`/`allowance`/`event Approval`
 - Produces: `config.tokens` (env `TOKENS` JSON 파싱, 기본 `[]`, 파싱 실패 시 빈 배열 + console.error), person.ejs `#donate-section`에 `data-tokens='<%= JSON.stringify(chain.tokens) %>'`, donate.js 통화 선택 UI
 
-- [ ] **Step 1: 실패하는 테스트 추가** — app.test.js append:
+- [x] **Step 1: 실패하는 테스트 추가** — app.test.js append:
 
 ```js
 test("donate-section이 설정된 토큰 목록을 노출한다", async (t) => {
@@ -136,11 +136,11 @@ test("donate-section이 설정된 토큰 목록을 노출한다", async (t) => {
 });
 ```
 
-- [ ] **Step 2: 실패 확인** — `npm test` → 신규 1개 FAIL
-- [ ] **Step 3: 서버 구현** — server.js: `tokens: JSON.parse(process.env.TOKENS ?? "[]")` (try/catch → [] + console.error). app.js: chain 객체에 `tokens: config.tokens ?? []`. person.ejs: donate-section에 `data-tokens` 속성 + 통화 `<select id="donate-token">`(ETH 고정 옵션 + 토큰들 — 서버 렌더).
-- [ ] **Step 4: donate.js 확장**
+- [x] **Step 2: 실패 확인** — `npm test` → 신규 1개 FAIL
+- [x] **Step 3: 서버 구현** — server.js: `tokens: JSON.parse(process.env.TOKENS ?? "[]")` (try/catch → [] + console.error). app.js: chain 객체에 `tokens: config.tokens ?? []`. person.ejs: donate-section에 `data-tokens` 속성 + 통화 `<select id="donate-token">`(ETH 고정 옵션 + 토큰들 — 서버 렌더).
+- [x] **Step 4: donate.js 확장**
   - load(): ETH 누적/내역 기존 유지 + 각 설정 토큰의 `totalDonatedToken`·`DonatedToken` 이벤트 조회, `ethers.formatUnits(amount, decimals)`로 표시 (`누적 0.5 ETH · 1,000 TKRW` 식)
   - 후원 클릭: 선택 통화가 ETH면 기존 경로. 토큰이면 `parseUnits(amount, decimals)` → `allowance` 확인 → 부족하면 `approve` tx (버튼 문구 "1/2 승인 중…") → `donateToken` tx ("2/2 후원 중…") → load() 갱신
   - ERC-20 ABI 상수는 donate.js 안에 최소로(`approve`,`allowance`,`event Approval` 불필요 — allowance/approve만)
-- [ ] **Step 5: 통과 확인** — `npm test` → 41 passing
-- [ ] **Step 6: 커밋**
+- [x] **Step 5: 통과 확인** — `npm test` → 41 passing
+- [x] **Step 6: 커밋**
