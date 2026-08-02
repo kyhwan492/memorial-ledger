@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head><%- include("partials/head") %></head>
+<body>
+<nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
+<h1>수정 요청 #<%= request.id %></h1>
+<dl>
+  <dt>인물</dt><dd><a href="/persons/<%= request.person_slug %>"><%= person ? person.name : request.person_slug %></a></dd>
+  <dt>대상 필드</dt><dd><%= request.field %></dd>
+  <dt>요청자</dt><dd><%= request.requester_name %> (<%= request.requester_contact %>)</dd>
+  <dt>제안 내용</dt><dd><%= request.proposed %></dd>
+  <dt>근거 출처</dt><dd><%= request.evidence %></dd>
+  <dt>요청 시각</dt><dd><%= request.created_at %></dd>
+  <dt>상태</dt><dd><span class="badge <%= request.status === "accepted" ? "ok" : "warn" %>"><%= request.status %></span></dd>
+  <% if (request.status !== "open") { %>
+  <dt>처리자</dt><dd><%= request.resolver_name %> · <%= request.resolved_at %></dd>
+  <dt>처리 사유</dt><dd><%= request.resolution_note %></dd>
+  <% if (request.resolved_version_id) { %>
+  <dt>반영 버전</dt><dd><a href="/versions/<%= request.resolved_version_id %>/diff">#<%= request.resolved_version_id %> 변경 내역</a></dd>
+  <% } %>
+  <% } %>
+</dl>
+
+<% if (request.status === "open") { %>
+<h2>처리 (작성자 전용)</h2>
+<form method="post" action="/requests/<%= request.id %>/resolve">
+  <p><label>처리 상태
+    <select name="status">
+      <option value="accepted">수용</option>
+      <option value="rejected">반려</option>
+    </select></label></p>
+  <p><label>처리자 이름(실명) <input name="resolverName" required></label></p>
+  <p><label>반영 버전 id (수용 시) <input name="versionId"></label></p>
+  <p><label>사유 (반려 시 필수)<br>
+     <textarea name="note" rows="4" cols="60"></textarea></label></p>
+  <button type="submit">처리 기록 남기기</button>
+</form>
+<% } %>
+</body>
+</html>

@@ -115,7 +115,7 @@ test("필수 필드가 빠지면 400", async (t) => {
   assert.equal(res.status, 400);
 });
 
-import { createDraft, markAnchored as dbMarkAnchored } from "../src/db.js";
+import { createDraft, markAnchored as dbMarkAnchored, listChangeRequests } from "../src/db.js";
 
 test("latest.json은 앵커된 최신 버전만 준다", async (t) => {
   const { base, db } = makeServer(t);
@@ -145,4 +145,63 @@ test("인물 페이지에 후원 섹션이 있다", async (t) => {
   const { base } = makeServer(t);
   const html = await (await fetch(base + "/persons/kim-gu")).text();
   assert.match(html, /donate-section/);
+});
+
+test("note가 content에 포함되어 해시에 반영된다", async (t) => {
+  const { base, db } = makeServer(t);
+  const body = new URLSearchParams({
+    slug: "kim-gu", name: "김구", category: "independence",
+    birth: "1876", death: "1949", summary: "수정된 요약", note: "출생 연도 출처 보강",
+  });
+  await fetch(base + "/persons", { method: "POST", body, redirect: "manual" });
+  const [draft] = listVersions(db, "kim-gu");
+  assert.equal(JSON.parse(draft.content_json).note, "출생 연도 출처 보강");
+});
+
+test("버전 diff가 바뀐 필드를 보여준다", async (t) => {
+  const { base, db } = makeServer(t);
+  const mk = (summary, note) => fetch(base + "/persons", {
+    method: "POST",
+    body: new URLSearchParams({ slug: "kim-gu", name: "김구", category: "independence",
+      birth: "1876", death: "1949", summary, note }),
+    redirect: "manual",
+  });
+  await mk("요약 v1", "최초 등록");
+  await mk("요약 v2", "오탈자 수정");
+  const [v2] = listVersions(db, "kim-gu");
+  const html = await (await fetch(`${base}/versions/${v2.id}/diff`)).text();
+  assert.match(html, /요약 v1/);
+  assert.match(html, /요약 v2/);
+  assert.match(html, /오탈자 수정/);
+});
+
+test("versions/:id.json이 chainIndex를 준다", async (t) => {
+  const { base, db } = makeServer(t);
+  const id = createDraft(db, { personSlug: "kim-gu", contentJson: '{"a":1}', contentHash: "0x" + "11".repeat(32) });
+  assert.equal((await fetch(`${base}/versions/${id}.json`)).status, 404); // draft는 404
+  dbMarkAnchored(db, { versionId: id, txHash: "0x" + "22".repeat(32), wallet: "0xW" });
+  const body = await (await fetch(`${base}/versions/${id}.json`)).json();
+  assert.equal(body.chainIndex, 0);
+  assert.equal(body.content.a, 1);
+});
+
+test("수정 요청 제출·공개 목록·처리", async (t) => {
+  const { base, db } = makeServer(t);
+  const bad = await fetch(base + "/requests", { method: "POST",
+    body: new URLSearchParams({ person: "kim-gu", requesterName: "박제보" }) });
+  assert.equal(bad.status, 400);
+  const ok = await fetch(base + "/requests", { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ person: "kim-gu", requesterName: "박제보", contact: "bo@ex.com",
+      field: "summary", proposed: "더 정확한 요약", evidence: "https://e-gonghun.mpva.go.kr/" }) });
+  assert.equal(ok.status, 302);
+  const list = await (await fetch(base + "/requests?status=open")).text();
+  assert.match(list, /박제보/);
+  const [req0] = listChangeRequests(db, {});
+  const noNote = await fetch(`${base}/requests/${req0.id}/resolve`, { method: "POST",
+    body: new URLSearchParams({ status: "rejected", resolverName: "홍역사" }) });
+  assert.equal(noNote.status, 400); // 반려엔 사유 필수
+  await fetch(`${base}/requests/${req0.id}/resolve`, { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ status: "rejected", resolverName: "홍역사", note: "근거 불충분" }) });
+  const detail = await (await fetch(`${base}/requests/${req0.id}`)).text();
+  assert.match(detail, /근거 불충분/);
 });

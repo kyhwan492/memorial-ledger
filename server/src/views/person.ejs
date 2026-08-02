@@ -2,10 +2,12 @@
 <html lang="ko">
 <head><%- include("partials/head") %></head>
 <body>
-<nav><a href="/">인물 목록</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
+<nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
 <h1><%= person.name %></h1>
 <p><%= CATEGORIES[person.category] ?? person.category %> · <%= person.birth %>–<%= person.death %></p>
 <p><%= person.summary %></p>
+<p><a href="/requests/new?person=<%= person.slug %>">이 기록 수정 요청하기</a> ·
+   <a href="/requests?status=open">미처리 요청 <%= openRequests %>건</a></p>
 
 <h2>출처</h2>
 <ul>
@@ -35,7 +37,7 @@
 
 <h2>버전 이력</h2>
 <table>
-  <thead><tr><th>버전</th><th>해시</th><th>상태</th><th>tx</th><th>등록 시각</th></tr></thead>
+  <thead><tr><th>버전</th><th>해시</th><th>상태</th><th>tx</th><th>등록 시각</th><th>변경</th><th>검증</th></tr></thead>
   <tbody>
   <% for (const v of versions) { %>
   <tr>
@@ -44,6 +46,16 @@
     <td><span class="badge <%= v.status === "anchored" ? "ok" : "warn" %>"><%= v.status %></span></td>
     <td><% if (v.tx_hash) { %><code><%= v.tx_hash.slice(0, 14) %>…</code><% } %></td>
     <td><%= v.created_at %></td>
+    <td><a href="/versions/<%= v.id %>/diff">변경 내역</a></td>
+    <td><% if (v.status === "anchored") { %>
+      <button class="verify-version-btn"
+              data-version-id="<%= v.id %>"
+              data-chain-index="<%= chainIndexes[v.id] %>"
+              data-person-id="<%= personIdHex %>"
+              data-rpc-url="<%= chain.rpcUrl %>"
+              data-contract="<%= chain.contract %>">검증</button>
+      <span class="verify-version-result"></span>
+    <% } %></td>
   </tr>
   <% } %>
   </tbody>

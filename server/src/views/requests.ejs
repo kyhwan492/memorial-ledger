@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head><%- include("partials/head") %></head>
+<body>
+<nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
+<h1>수정 요청 (실명 공개)</h1>
+<p>요청자 이름과 근거는 공개됩니다. 익명 요청은 받지 않습니다.</p>
+<p>
+  <a href="/requests">전체</a>
+  <a href="/requests?status=open">미처리</a>
+  <a href="/requests?status=accepted">수용</a>
+  <a href="/requests?status=rejected">반려</a>
+  <% if (status) { %>· 현재 필터: <%= status %><% } %>
+</p>
+<table>
+  <thead><tr><th>번호</th><th>인물</th><th>필드</th><th>요청자</th><th>상태</th><th>요청 시각</th></tr></thead>
+  <tbody>
+  <% for (const r of requests) { %>
+  <tr>
+    <td><a href="/requests/<%= r.id %>">#<%= r.id %></a></td>
+    <td><a href="/persons/<%= r.person_slug %>"><%= r.person_slug %></a></td>
+    <td><%= r.field %></td>
+    <td><%= r.requester_name %></td>
+    <td><span class="badge <%= r.status === "accepted" ? "ok" : "warn" %>"><%= r.status %></span></td>
+    <td><%= r.created_at %></td>
+  </tr>
+  <% } %>
+  </tbody>
+</table>
+</body>
+</html>
