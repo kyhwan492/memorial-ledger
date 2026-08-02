@@ -27,9 +27,16 @@
 <div id="donate-section"
      data-donations="<%= chain.donations %>"
      data-person-id="<%= personIdHex %>"
-     data-rpc-url="<%= chain.rpcUrl %>">
+     data-rpc-url="<%= chain.rpcUrl %>"
+     data-tokens='<%= JSON.stringify(chain.tokens) %>'>
   <p id="donate-status">후원 정보를 불러오는 중…</p>
-  <p><input id="donate-amount" type="number" step="0.001" min="0" placeholder="ETH">
+  <p><input id="donate-amount" type="number" step="0.001" min="0" placeholder="금액">
+     <select id="donate-token">
+       <option value="">ETH</option>
+       <% for (const t of chain.tokens) { %>
+       <option value="<%= t.address %>"><%= t.symbol %></option>
+       <% } %>
+     </select>
      <button id="donate-btn">MetaMask로 후원</button></p>
   <ul id="donate-history"></ul>
 </div>

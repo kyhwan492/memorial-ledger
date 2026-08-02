@@ -270,3 +270,15 @@ test("심사 전환은 open에서만, 요청 목록에 in_review 필터", async 
   const list = await (await fetch(base + "/requests?status=in_review")).text();
   assert.match(list, /박제보/);
 });
+
+test("donate-section이 설정된 토큰 목록을 노출한다", async (t) => {
+  const db = openDb();
+  upsertPerson(db, { slug: "kim-gu", name: "김구", category: "independence",
+    birth: "1876", death: "1949", summary: "x" });
+  const app = createApp(db, { rpcUrl: "http://127.0.0.1:8545", contract: "0x0",
+    tokens: [{ symbol: "TKRW", address: "0x" + "aa".repeat(20), decimals: 18 }] });
+  const server = app.listen(0);
+  t.after(() => server.close());
+  const html = await (await fetch(`http://127.0.0.1:${server.address().port}/persons/kim-gu`)).text();
+  assert.match(html, /TKRW/);
+});
