@@ -30,7 +30,7 @@
 - requests.ejs: 상태 필터에 in_review 추가, 목록 행에 상태 뱃지.
 - about.ejs + docs/architecture.md: "편집 거버넌스" 섹션 — 3단계 경로(제보→심사→확정), 정족수 규칙, 단순 정정 예외, 리뷰는 오프체인 공개·체인엔 확정본만.
 
-- [ ] **Step 1: 실패하는 테스트 추가** — app.test.js append (실제 코드):
+- [x] **Step 1: 실패하는 테스트 추가** — app.test.js append (실제 코드):
 
 ```js
 test("심사 전환과 리뷰 제출, 정족수 강제", async (t) => {
@@ -80,11 +80,11 @@ test("심사 전환은 open에서만, 요청 목록에 in_review 필터", async 
 });
 ```
 
-- [ ] **Step 2: 실패 확인** — `cd server && npm test` → 신규 2개 FAIL
-- [ ] **Step 3: 라우트 구현** (escalate/reviews/resolve 정족수 403)
-- [ ] **Step 4: 뷰 + about + architecture.md** (기존 컨벤션·이스케이프 준수)
-- [ ] **Step 5: 통과 확인** — `npm test` → 39 passing
-- [ ] **Step 6: 커밋**
+- [x] **Step 2: 실패 확인** — `cd server && npm test` → 신규 2개 FAIL
+- [x] **Step 3: 라우트 구현** (escalate/reviews/resolve 정족수 403)
+- [x] **Step 4: 뷰 + about + architecture.md** (기존 컨벤션·이스케이프 준수)
+- [x] **Step 5: 통과 확인** — `npm test` → 39 passing
+- [x] **Step 6: 커밋**
 
 ---
 
@@ -102,7 +102,7 @@ test("심사 전환은 open에서만, 요청 목록에 in_review 필터", async 
   - `submitReview(db, {requestId, reviewerName, verdict, comment})` → `{id}` — 전부 필수·verdict 화이트리스트 검증(throw), 요청이 in_review 아니면 throw
 - server.js: 도구 2개 추가 (`get_change_request`, `submit_review`), zod 스키마, 한국어 description
 
-- [ ] **Step 1: 실패하는 테스트 추가** — mcp-handlers.test.js append (실제 코드):
+- [x] **Step 1: 실패하는 테스트 추가** — mcp-handlers.test.js append (실제 코드):
 
 ```js
 import { addChangeRequest, escalateRequest } from "../src/db.js";
@@ -129,7 +129,7 @@ test("getRequestDetail과 submitReview", () => {
 
 (import 문은 기존 import에 병합)
 
-- [ ] **Step 2: 실패 확인** — `npm test` → 신규 1개 FAIL
-- [ ] **Step 3: handlers + server.js 도구 등록 + README 도구 목록에 2개 추가**
-- [ ] **Step 4: 통과 확인** — `npm test` 그린 + initialize 핸드셰이크 확인(플랜 v3 Task M Step 4와 같은 방법)
-- [ ] **Step 5: 커밋**
+- [x] **Step 2: 실패 확인** — `npm test` → 신규 1개 FAIL
+- [x] **Step 3: handlers + server.js 도구 등록 + README 도구 목록에 2개 추가**
+- [x] **Step 4: 통과 확인** — `npm test` 그린 + initialize 핸드셰이크 확인(플랜 v3 Task M Step 4와 같은 방법)
+- [x] **Step 5: 커밋**
