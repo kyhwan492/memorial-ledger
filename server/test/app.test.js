@@ -2,15 +2,18 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createApp } from "../src/app.js";
 import { openDb, upsertPerson, addAuthor } from "../src/db.js";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
-function makeServer(t) {
+function makeServer(t, config = {}) {
   const db = openDb();
   upsertPerson(db, {
     slug: "kim-gu", name: "김구", category: "independence",
     birth: "1876", death: "1949", summary: "대한민국 임시정부 주석",
   });
   addAuthor(db, { name: "홍역사", credential: "사학과 교수", wallet: "0xABC" });
-  const app = createApp(db, { rpcUrl: "http://127.0.0.1:8545", contract: "0x0" });
+  const app = createApp(db, { rpcUrl: "http://127.0.0.1:8545", contract: "0x0", ...config });
   const server = app.listen(0);
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -281,4 +284,65 @@ test("donate-section이 설정된 토큰 목록을 노출한다", async (t) => {
   t.after(() => server.close());
   const html = await (await fetch(`http://127.0.0.1:${server.address().port}/persons/kim-gu`)).text();
   assert.match(html, /TKRW/);
+});
+
+test("훈격·운동계열 필터가 동작한다", async (t) => {
+  const { base, db } = makeServer(t);
+  upsertPerson(db, { slug: "an-junggeun", name: "안중근", category: "independence",
+    birth: "1879", death: "1910", summary: "z", hunkuk: "대한민국장", workoutAffil: "의열투쟁" });
+  const html = await (await fetch(base + "/?hunkuk=" + encodeURIComponent("대한민국장"))).text();
+  assert.match(html, /안중근/);
+  assert.doesNotMatch(html, /김구<\/a>/);
+  const partial = await (await fetch(base + "/?workoutAffil=" + encodeURIComponent("의열투쟁"),
+    { headers: { "HX-Request": "true" } })).text();
+  assert.match(partial, /안중근/);
+});
+
+test("상세 페이지가 확장 필드를 값이 있을 때만 보여준다", async (t) => {
+  const { base, db } = makeServer(t);
+  upsertPerson(db, { slug: "kim-gu", name: "김구", category: "independence",
+    birth: "1876", death: "1949", summary: "임시정부 주석",
+    hunkuk: "대한민국장", workoutAffil: "임시정부", judgeYear: "1962", alias: "백범" });
+  const html = await (await fetch(base + "/persons/kim-gu")).text();
+  assert.match(html, /대한민국장/);
+  assert.match(html, /백범/);
+  const other = await (await fetch(base + "/persons/kim-gu")).text(); // 값 없는 sex는 미표시
+  assert.doesNotMatch(other, /성별/);
+});
+
+test("확장 필드가 정본 content에 값이 있을 때만 포함된다", async (t) => {
+  const { base, db } = makeServer(t);
+  await fetch(base + "/persons", { method: "POST", redirect: "manual",
+    body: new URLSearchParams({ slug: "kim-gu", name: "김구", category: "independence",
+      birth: "1876", death: "1949", summary: "x", note: "필드 보강", hunkuk: "대한민국장" }) });
+  const [draft] = listVersions(db, "kim-gu");
+  const content = JSON.parse(draft.content_json);
+  assert.equal(content.hunkuk, "대한민국장");
+  assert.equal("alias" in content, false); // 빈 필드는 생략
+});
+
+test("이달의 독립운동가 섹션은 monthly.json이 있고 이번 달 항목이 있을 때만", async (t) => {
+  const now = new Date();
+  const dir = mkdtempSync(join(tmpdir(), "monthly-"));
+  const file = join(dir, "monthly.json");
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+
+  const { base, db } = makeServer(t, { monthlyPath: file });
+  assert.doesNotMatch(await (await fetch(base + "/")).text(), /이달의 독립운동가/); // 파일 없음
+
+  writeFileSync(file, JSON.stringify([
+    { year: now.getFullYear() - 1, month: now.getMonth() + 1, name: "지난해", mngNo: "1", summary: "s" },
+    { year: now.getFullYear(), month: now.getMonth() + 1, name: "이달인물", mngNo: "9-777", summary: "이달의 공적" },
+  ]));
+  const html = await (await fetch(base + "/")).text();
+  assert.match(html, /이달의 독립운동가/);
+  assert.match(html, /이달인물/);
+  assert.doesNotMatch(html, /지난해/);
+  assert.doesNotMatch(html, /href="\/persons\/gonghun-9-777"/); // 원장에 없으면 링크 없음
+
+  upsertPerson(db, { slug: "gonghun-9-777", name: "이달인물", category: "independence" });
+  assert.match(await (await fetch(base + "/")).text(), /href="\/persons\/gonghun-9-777"/);
+
+  writeFileSync(file, "깨진 json");
+  assert.doesNotMatch(await (await fetch(base + "/")).text(), /이달의 독립운동가/);
 });

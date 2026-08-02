@@ -16,6 +16,11 @@
     </select></label></p>
   <p><label>출생 <input name="birth" value="<%= person?.birth ?? "" %>"></label>
      <label>사망 <input name="death" value="<%= person?.death ?? "" %>"></label></p>
+  <p><label>훈격 <input name="hunkuk" value="<%= person?.hunkuk ?? "" %>"></label>
+     <label>운동계열 <input name="workoutAffil" value="<%= person?.workout_affil ?? "" %>"></label></p>
+  <p><label>서훈년도 <input name="judgeYear" value="<%= person?.judge_year ?? "" %>"></label>
+     <label>이명 <input name="alias" value="<%= person?.alias ?? "" %>"></label>
+     <label>성별 <input name="sex" value="<%= person?.sex ?? "" %>"></label></p>
   <p><label>공적 요약<br>
      <textarea name="summary" rows="8" cols="60"><%= person?.summary ?? "" %></textarea></label></p>
   <p><label>변경 사유<br>

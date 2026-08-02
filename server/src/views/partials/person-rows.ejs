@@ -3,8 +3,10 @@
   <td><a href="/persons/<%= p.slug %>"><%= p.name %></a></td>
   <td><%= CATEGORIES[p.category] ?? p.category %></td>
   <td><%= p.birth %>–<%= p.death %></td>
+  <td><%= p.hunkuk %></td>
+  <td><%= p.workout_affil %></td>
 </tr>
 <% } %>
 <% if (persons.length === 0) { %>
-<tr><td colspan="3">결과가 없습니다</td></tr>
+<tr><td colspan="5">결과가 없습니다</td></tr>
 <% } %>

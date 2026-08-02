@@ -4,18 +4,40 @@
 <body>
 <nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a><a href="/persons/new/edit">기록 등록</a></nav>
 <h1>기억 원장</h1>
+<% if (monthly) { %>
+<section>
+  <h2>이달의 독립운동가</h2>
+  <p><% if (monthly.slug) { %><a href="/persons/<%= monthly.slug %>"><%= monthly.name %></a>
+     <% } else { %><%= monthly.name %><% } %>
+     <small>(<%= monthly.year %>년 <%= monthly.month %>월)</small></p>
+  <% if (monthly.summary) { %><p><%= monthly.summary %></p><% } %>
+</section>
+<% } %>
 <form>
   <input type="search" name="q" value="<%= query %>" placeholder="이름 검색"
-         hx-get="/" hx-trigger="input changed delay:300ms" hx-target="#rows">
-  <select name="category" hx-get="/" hx-target="#rows">
+         hx-get="/" hx-trigger="input changed delay:300ms" hx-target="#rows"
+         hx-include="closest form">
+  <select name="category" hx-get="/" hx-target="#rows" hx-include="closest form">
     <option value="">전체 분류</option>
     <% for (const [k, label] of Object.entries(CATEGORIES)) { %>
     <option value="<%= k %>" <%= k === category ? "selected" : "" %>><%= label %></option>
     <% } %>
   </select>
+  <select name="hunkuk" hx-get="/" hx-target="#rows" hx-include="closest form">
+    <option value="">전체 훈격</option>
+    <% for (const v of filters.hunkuks) { %>
+    <option value="<%= v %>" <%= v === hunkuk ? "selected" : "" %>><%= v %></option>
+    <% } %>
+  </select>
+  <select name="workoutAffil" hx-get="/" hx-target="#rows" hx-include="closest form">
+    <option value="">전체 운동계열</option>
+    <% for (const v of filters.affils) { %>
+    <option value="<%= v %>" <%= v === workoutAffil ? "selected" : "" %>><%= v %></option>
+    <% } %>
+  </select>
 </form>
 <table>
-  <thead><tr><th>이름</th><th>분류</th><th>생몰</th></tr></thead>
+  <thead><tr><th>이름</th><th>분류</th><th>생몰</th><th>훈격</th><th>운동계열</th></tr></thead>
   <tbody id="rows"><%- include("partials/person-rows", { persons, CATEGORIES }) %></tbody>
 </table>
 </body>
