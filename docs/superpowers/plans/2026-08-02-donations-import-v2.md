@@ -12,7 +12,7 @@
 
 - v1 플랜의 Global Constraints 전부 유지 (Node 24+, 브라우저 JS 섬 원칙, 한국어 UI, Co-Authored-By 금지)
 - 후원 내역·수혜자 정보는 서버 DB에 저장하지 않는다 — 체인이 유일한 소스
-- API 키는 `GONGHUN_API_KEY` env로만; 코드·픽스처에 실제 키 금지
+- ~~API 키는 `GONGHUN_API_KEY` env로만~~ → 구현 중 실호출로 확인: 공훈록 엔드포인트는 키 불필요 (리뷰 iteration 2에서 키 게이트 제거)
 
 ---
 
@@ -25,7 +25,7 @@
 **Interfaces:**
 - Produces: `Donations` — `owner()`, `beneficiaries(bytes32) view returns (address)`, `totalDonated(bytes32) view returns (uint256)`, `registerBeneficiary(bytes32 personId, address payable to, string profileUri)` (onlyOwner, zero주소 revert "zero address", 빈 profileUri revert "empty profile"), `donate(bytes32 personId) payable` (수혜자 없으면 revert "no beneficiary", 0원 revert "zero amount", 전액 즉시 전달, 실패 시 revert "transfer failed"), 이벤트 `BeneficiaryRegistered(bytes32 indexed personId, address beneficiary, string profileUri)`, `Donated(bytes32 indexed personId, address indexed donor, uint256 amount)`
 
-- [ ] **Step 1: 실패하는 테스트 작성**
+- [x] **Step 1: 실패하는 테스트 작성**
 
 `contracts/test/Donations.test.js`:
 
@@ -93,9 +93,9 @@ describe("Donations", function () {
 });
 ```
 
-- [ ] **Step 2: 실패 확인** — Run: `cd contracts && npx hardhat test test/Donations.test.js` / Expected: HH700 (Donations.sol 없음)
+- [x] **Step 2: 실패 확인** — Run: `cd contracts && npx hardhat test test/Donations.test.js` / Expected: HH700 (Donations.sol 없음)
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `contracts/contracts/Donations.sol`:
 
@@ -142,9 +142,9 @@ contract Donations {
 }
 ```
 
-- [ ] **Step 4: 통과 확인** — Run: `npx hardhat test` / Expected: 12 passing (기존 8 + 신규 4)
+- [x] **Step 4: 통과 확인** — Run: `npx hardhat test` / Expected: 12 passing (기존 8 + 신규 4)
 
-- [ ] **Step 5: 커밋** — `git add contracts && git commit -m "feat: Donations 컨트랙트 - 무보관 즉시 전달 후원"`
+- [x] **Step 5: 커밋** — `git add contracts && git commit -m "feat: Donations 컨트랙트 - 무보관 즉시 전달 후원"`
 
 ---
 
@@ -162,7 +162,7 @@ contract Donations {
 - Consumes: Task D1의 Donations ABI, 기존 chain config 패턴 (app.js의 `chain` 객체)
 - Produces: person.ejs에 `#donate-section`(data-donations, data-person-id, data-rpc-url, data-slug), donate.js가 누적액·내역 로드 + MetaMask 후원
 
-- [ ] **Step 1: 실패하는 테스트 추가** — app.test.js append:
+- [x] **Step 1: 실패하는 테스트 추가** — app.test.js append:
 
 ```js
 test("인물 페이지에 후원 섹션이 있다", async (t) => {
@@ -174,11 +174,11 @@ test("인물 페이지에 후원 섹션이 있다", async (t) => {
 
 Run: `cd server && npm test` → 신규 1개 FAIL 확인.
 
-- [ ] **Step 2: app.js/server.js 수정**
+- [x] **Step 2: app.js/server.js 수정**
 
 `createApp`의 chain 객체를 `{ rpcUrl, contract, donations: config.donations ?? "" }`로 확장. `server.js`에서 `donations: process.env.DONATIONS_ADDRESS ?? ""` 전달.
 
-- [ ] **Step 3: person.ejs 후원 섹션** — "버전 이력" 위에 추가:
+- [x] **Step 3: person.ejs 후원 섹션** — "버전 이력" 위에 추가:
 
 ```html
 <h2>후원</h2>
@@ -196,7 +196,7 @@ Run: `cd server && npm test` → 신규 1개 FAIL 확인.
 
 라우트에서 `personIdHex: ethers.id(person.slug)`를 person.ejs 렌더에 추가로 전달.
 
-- [ ] **Step 4: donate.js**
+- [x] **Step 4: donate.js**
 
 ```js
 // 후원 JS 섬: 수혜자·누적액·내역을 체인에서 직접 읽고(무신뢰), MetaMask로 후원한다.
@@ -255,11 +255,11 @@ load().catch((e) => { status.textContent = `로드 실패: ${e.shortMessage ?? e
 
 주의: person.ejs는 이미 ethers UMD를 로드한다(verify.js용) — donate.js도 그 전역을 쓴다.
 
-- [ ] **Step 5: deploy.js 갱신** — Donations 배포 + 로컬 데모용으로 hardhat 계정 #2를 kim-gu 수혜자로 등록(`ethers.id("kim-gu")`), 두 주소 모두 출력하고 서버 실행 안내에 `DONATIONS_ADDRESS=` 포함. Sepolia(계정 1개)에서는 수혜자 등록 스킵.
+- [x] **Step 5: deploy.js 갱신** — Donations 배포 + 로컬 데모용으로 hardhat 계정 #2를 kim-gu 수혜자로 등록(`ethers.id("kim-gu")`), 두 주소 모두 출력하고 서버 실행 안내에 `DONATIONS_ADDRESS=` 포함. Sepolia(계정 1개)에서는 수혜자 등록 스킵.
 
-- [ ] **Step 6: 통과 확인** — `npm test` → 21 passing. 수동: 로컬 스택 재기동 후 인물 페이지에서 후원 1건 실행, 내역 표시 확인.
+- [x] **Step 6: 통과 확인** — `npm test` → 21 passing. 수동: 로컬 스택 재기동 후 인물 페이지에서 후원 1건 실행, 내역 표시 확인.
 
-- [ ] **Step 7: 커밋**
+- [x] **Step 7: 커밋**
 
 ---
 
@@ -274,12 +274,12 @@ load().catch((e) => { status.textContent = `로드 실패: ${e.shortMessage ?? e
 - Consumes: db.js `openDb/upsertPerson/addSource`
 - Produces: `mapRow(apiRow) -> {slug, name, category:"independence", birth, death, summary}` (gonghun-map.js), CLI `node scripts/import-gonghun.js [--limit 100] [--page 1]`
 
-- [ ] **Step 1: API 스펙 확인** — https://www.data.go.kr/data/15057718/openapi.do 문서(WebFetch/curl)에서 엔드포인트·요청 파라미터·응답 필드명을 확인해 매핑을 작성한다. 문서 접근이 안 되면 필드명을 추정하지 말고 리포트에 명시하고 매핑 함수를 TODO 없이 "문서 기반으로 확인된 필드만" 구현.
+- [x] **Step 1: API 스펙 확인** — https://www.data.go.kr/data/15057718/openapi.do 문서(WebFetch/curl)에서 엔드포인트·요청 파라미터·응답 필드명을 확인해 매핑을 작성한다. 문서 접근이 안 되면 필드명을 추정하지 말고 리포트에 명시하고 매핑 함수를 TODO 없이 "문서 기반으로 확인된 필드만" 구현.
 
-- [ ] **Step 2: 매핑 함수 TDD** — 문서의 응답 예시를 픽스처로 `gonghun-map.test.js` 작성(실패 확인) → `gonghun-map.js` 구현(통과). slug는 `gonghun-<관리번호>`, 관리번호 없으면 이름+생년 조합. 출처는 공훈전자사료관(https://e-gonghun.mpva.go.kr/) 링크.
+- [x] **Step 2: 매핑 함수 TDD** — 문서의 응답 예시를 픽스처로 `gonghun-map.test.js` 작성(실패 확인) → `gonghun-map.js` 구현(통과). slug는 `gonghun-<관리번호>`, 관리번호 없으면 이름+생년 조합. 출처는 공훈전자사료관(https://e-gonghun.mpva.go.kr/) 링크.
 
-- [ ] **Step 3: CLI 스크립트** — fetch로 API 호출(`GONGHUN_API_KEY` 필수, 없으면 사용법 출력 후 exit 1), 페이지네이션, `mapRow` 적용해 upsert, `임포트 완료: N명` 출력. 네트워크 오류는 페이지 단위 재시도 1회.
+- [x] **Step 3: CLI 스크립트** — fetch로 API 호출(키 불필요 — 실호출 확인), 항상 고정 PAGE_SIZE로 페이지네이션(창 밀림 방지), `mapRow` 적용해 upsert, limit 도달 시 중단, `임포트 완료: N명` 출력. 네트워크 오류는 페이지 단위 재시도 1회.
 
-- [ ] **Step 4: 통과 확인** — `npm test` 그린(매핑 테스트 포함). 실제 API 호출은 키 발급 후 수동 검증(리포트에 명시).
+- [x] **Step 4: 통과 확인** — `npm test` 그린(매핑 테스트 포함). 실제 API 호출은 키 발급 후 수동 검증(리포트에 명시).
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**

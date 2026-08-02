@@ -22,7 +22,8 @@ npx hardhat run scripts/deploy.js --network localhost  # 터미널 2 — 주소 
 # 2. 서버
 cd ../server && npm install
 node scripts/seed.js
-CONTRACT_ADDRESS=<배포 주소> node src/server.js   # http://localhost:3000
+node scripts/import-gonghun.js --limit 100        # 공훈록 실데이터 임포트 (키 불필요, 선택)
+CONTRACT_ADDRESS=<배포 주소> DONATIONS_ADDRESS=<후원 주소> node src/server.js   # http://localhost:3000
 ```
 
 기록 작성 테스트: MetaMask에 hardhat 계정 #1
