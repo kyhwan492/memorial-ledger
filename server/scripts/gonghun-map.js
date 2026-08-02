@@ -46,6 +46,6 @@ export function mapMonthly(item) {
     month: clean(item.POST_MONTH),
     name: clean(item.NAME_KO) || clean(item.NAME_CH),
     mngNo: clean(item.MNG_NO),
-    summary: clean(item.ACHIVEMENT).split(/\s{2,}/)[0].trim(),
+    summary: clean(item.ACHIVEMENT).split(/\s{2,}/)[0].trim().slice(0, 100),
   };
 }

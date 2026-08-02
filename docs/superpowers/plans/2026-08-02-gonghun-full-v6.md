@@ -30,8 +30,8 @@
   - `fetch-monthly.js` — 이달의 독립운동가 API(`/user/IndepCrusaderOpenAPI.do` 문서에서 엔드포인트 확인) → `server/data/monthly.json`에 `[{year, month, name, mngNo, summary}]` 형태 저장. 이 파일 스키마가 Task W와의 계약이다.
   - 공적조서(`/user/RewardOpenAPI.do` 문서 확인): 실API가 확인되면 인물별 공적조서를 `sources`에 `label: "공적조서(YYYY)"` + url(사료관 상세 링크) 로 추가하는 `import-reward.js` 작성. 확인 불가면 생략하고 리포트에 근거 기록.
 
-- [ ] **Step 1: API 명세 확인** — curl로 공훈록 실응답 1건(전체 필드), 이달의 독립운동가·공적조서 문서 페이지와 실응답 확인. 확인 내용을 리포트에 남긴다.
-- [ ] **Step 2: 실패하는 테스트 추가** — gonghun-map.test.js append (실응답 기반 픽스처로 아래를 구체화):
+- [x] **Step 1: API 명세 확인** — curl로 공훈록 실응답 1건(전체 필드), 이달의 독립운동가·공적조서 문서 페이지와 실응답 확인. 확인 내용을 리포트에 남긴다.
+- [x] **Step 2: 실패하는 테스트 추가** — gonghun-map.test.js append (실응답 기반 픽스처로 아래를 구체화):
 
 ```js
 test("mapRow가 훈격·운동계열·서훈년도·이명·성별을 매핑한다", () => {
@@ -48,9 +48,9 @@ test("mapReferences가 참고문헌을 출처 항목으로 만든다", () => {
 });
 ```
 
-- [ ] **Step 3: 구현 + 통과** — `npm test` 그린 (기존 44 + 신규)
-- [ ] **Step 4: 실동작 검증** — `DB_PATH=/tmp/v6-check.db node scripts/import-gonghun.js --limit 5` 실행, 훈격 등 채워지는지 sqlite로 확인. `node scripts/fetch-monthly.js` 실행해 monthly.json 생성 확인. 결과를 리포트에.
-- [ ] **Step 5: 커밋** (스킵 — 오케스트레이터)
+- [x] **Step 3: 구현 + 통과** — `npm test` 그린 (기존 44 + 신규)
+- [x] **Step 4: 실동작 검증** — `DB_PATH=/tmp/v6-check.db node scripts/import-gonghun.js --limit 5` 실행, 훈격 등 채워지는지 sqlite로 확인. `node scripts/fetch-monthly.js` 실행해 monthly.json 생성 확인. 결과를 리포트에.
+- [x] **Step 5: 커밋** (스킵 — 오케스트레이터)
 
 ---
 
@@ -67,7 +67,7 @@ test("mapReferences가 참고문헌을 출처 항목으로 만든다", () => {
   - person.ejs — 훈격·운동계열·서훈년도·이명·성별 표시(값 있을 때만)
   - edit.ejs + POST /persons — 새 필드 입력·정본 포함(**값 있는 것만** content에 넣는다: `if (hunkuk) content.hunkuk = hunkuk` 식)
 
-- [ ] **Step 1: 실패하는 테스트 추가** — app.test.js append:
+- [x] **Step 1: 실패하는 테스트 추가** — app.test.js append:
 
 ```js
 test("훈격·운동계열 필터가 동작한다", async (t) => {
@@ -106,7 +106,7 @@ test("확장 필드가 정본 content에 값이 있을 때만 포함된다", asy
 });
 ```
 
-- [ ] **Step 2: 실패 확인** — `npm test` → 신규 3개 FAIL
-- [ ] **Step 3: 구현** — app.js 필터 파라미터·listFilterValues 전달·monthly.json 읽기(try/catch, 요청 시 lazy read), 뷰 4개. 이달의 섹션은 index.ejs 상단에 값 있을 때만.
-- [ ] **Step 4: 통과 확인** — `npm test` → 47 passing
-- [ ] **Step 5: 커밋** (스킵 — 오케스트레이터)
+- [x] **Step 2: 실패 확인** — `npm test` → 신규 3개 FAIL
+- [x] **Step 3: 구현** — app.js 필터 파라미터·listFilterValues 전달·monthly.json 읽기(try/catch, 요청 시 lazy read), 뷰 4개. 이달의 섹션은 index.ejs 상단에 값 있을 때만.
+- [x] **Step 4: 통과 확인** — `npm test` → 47 passing
+- [x] **Step 5: 커밋** (스킵 — 오케스트레이터)

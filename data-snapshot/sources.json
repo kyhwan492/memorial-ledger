@@ -148,5 +148,503 @@
     "person_slug": "gonghun-955397",
     "label": "국가보훈부 공훈전자사료관",
     "url": "https://e-gonghun.mpva.go.kr/"
+  },
+  {
+    "id": 26,
+    "person_slug": "gonghun-950430",
+    "label": "신문조서(訊問調書)(동경지방재판소, 1923. 10. 25, 1924. 1. 24, 1. 25, 3. 31, 5. 14)",
+    "url": ""
+  },
+  {
+    "id": 27,
+    "person_slug": "gonghun-950430",
+    "label": "예심종결결정(豫審終結決定)(1925. 7. 7)",
+    "url": ""
+  },
+  {
+    "id": 28,
+    "person_slug": "gonghun-950430",
+    "label": "예심청구서(豫審請求書)(1925. 7. 17)",
+    "url": ""
+  },
+  {
+    "id": 29,
+    "person_slug": "gonghun-950430",
+    "label": "판결문(判決文)(대심원 제1특별형사부, 1926. 3. 25)",
+    "url": ""
+  },
+  {
+    "id": 30,
+    "person_slug": "gonghun-950430",
+    "label": "고등경찰요사(高等警察要史)(경상북도경찰부, 1934)",
+    "url": ""
+  },
+  {
+    "id": 31,
+    "person_slug": "gonghun-950430",
+    "label": "동아일보(東亞日報)(1925. 8. 4, 12. 20, 1926. 3. 1, 4. 21, 4. 24)",
+    "url": ""
+  },
+  {
+    "id": 32,
+    "person_slug": "gonghun-950430",
+    "label": "시대일보(時代日報)(1925. 11. 25)",
+    "url": ""
+  },
+  {
+    "id": 33,
+    "person_slug": "gonghun-8108",
+    "label": "신분장지문조회회보서",
+    "url": ""
+  },
+  {
+    "id": 34,
+    "person_slug": "gonghun-8108",
+    "label": "제적등본(1945. 3. 29 대전형무소에서 옥사)",
+    "url": ""
+  },
+  {
+    "id": 35,
+    "person_slug": "gonghun-8108",
+    "label": "인고90년사(85. 12. 20) 189면",
+    "url": ""
+  },
+  {
+    "id": 36,
+    "person_slug": "gonghun-1069",
+    "label": "신분장지문조회회보서",
+    "url": ""
+  },
+  {
+    "id": 37,
+    "person_slug": "gonghun-1069",
+    "label": "한국독립운동사(문일민) 173면",
+    "url": ""
+  },
+  {
+    "id": 38,
+    "person_slug": "gonghun-1069",
+    "label": "명치백년사총서(김정명) 제1권 분책 321·322면",
+    "url": ""
+  },
+  {
+    "id": 39,
+    "person_slug": "gonghun-952208",
+    "label": "판결문(전주지방법원: 1935. 10. 25)",
+    "url": ""
+  },
+  {
+    "id": 40,
+    "person_slug": "gonghun-952208",
+    "label": "동아일보(東亞日報)(1933. 8. 26, 1934. 12. 29, 1935. 8. 8).",
+    "url": ""
+  },
+  {
+    "id": 41,
+    "person_slug": "gonghun-1421",
+    "label": "무장독립운동비사 14면",
+    "url": ""
+  },
+  {
+    "id": 42,
+    "person_slug": "gonghun-1421",
+    "label": "독립운동사(국가보훈처) 2권 216면, 10권 668면",
+    "url": ""
+  },
+  {
+    "id": 43,
+    "person_slug": "gonghun-1421",
+    "label": "독립운동사자료집(국가보훈처) 11권 549·550면, 14권 809면",
+    "url": ""
+  },
+  {
+    "id": 44,
+    "person_slug": "gonghun-956314",
+    "label": "판결문(判決文)(대구복심법원 : 1923. 3. 27)",
+    "url": ""
+  },
+  {
+    "id": 45,
+    "person_slug": "gonghun-956314",
+    "label": "형사공소사건부(刑事控訴事件簿)",
+    "url": ""
+  },
+  {
+    "id": 46,
+    "person_slug": "gonghun-956314",
+    "label": "집행원부(執行原簿)",
+    "url": ""
+  },
+  {
+    "id": 47,
+    "person_slug": "gonghun-956314",
+    "label": "매일신보(每日申報)(1919. 5. 29)",
+    "url": ""
+  },
+  {
+    "id": 48,
+    "person_slug": "gonghun-956314",
+    "label": "신한민보(新韓民報)(1919. 9. 6)",
+    "url": ""
+  },
+  {
+    "id": 49,
+    "person_slug": "gonghun-956314",
+    "label": "독립운동사(독립운동사편찬위원회, 1971) 제3권 241~243면",
+    "url": ""
+  },
+  {
+    "id": 50,
+    "person_slug": "gonghun-956314",
+    "label": "창원군지(창원군지편찬위원회, 1994) 371~374면",
+    "url": ""
+  },
+  {
+    "id": 51,
+    "person_slug": "gonghun-4097",
+    "label": "판결문(1932. 3. 22 대구복심법원)",
+    "url": ""
+  },
+  {
+    "id": 52,
+    "person_slug": "gonghun-4097",
+    "label": "신분장지문원지(경찰청)",
+    "url": ""
+  },
+  {
+    "id": 53,
+    "person_slug": "gonghun-4097",
+    "label": "동아일보(1933. 11. 22)",
+    "url": ""
+  },
+  {
+    "id": 54,
+    "person_slug": "gonghun-70001",
+    "label": "한국독립운동사(문일민) 492면",
+    "url": ""
+  },
+  {
+    "id": 55,
+    "person_slug": "gonghun-70001",
+    "label": "한국독립사(김승학) 전권 355면",
+    "url": ""
+  },
+  {
+    "id": 56,
+    "person_slug": "gonghun-70001",
+    "label": "독립운동사자료집(국가보훈처) 제14집 936면",
+    "url": ""
+  },
+  {
+    "id": 57,
+    "person_slug": "gonghun-70001",
+    "label": "독립신문(1925. 5. 5)",
+    "url": ""
+  },
+  {
+    "id": 58,
+    "person_slug": "gonghun-70001",
+    "label": "독립운동사(국가보훈처) 제5권 468면",
+    "url": ""
+  },
+  {
+    "id": 59,
+    "person_slug": "gonghun-70001",
+    "label": "한국독립운동사(국사편찬위원회) 제4권 128면",
+    "url": ""
+  },
+  {
+    "id": 60,
+    "person_slug": "gonghun-80006",
+    "label": "조선민족운동연감 179·190·196면",
+    "url": ""
+  },
+  {
+    "id": 61,
+    "person_slug": "gonghun-80006",
+    "label": "고등경찰요사(경북경찰부) 105·139면",
+    "url": ""
+  },
+  {
+    "id": 62,
+    "person_slug": "gonghun-80006",
+    "label": "임시정부의정원문서(국회도서관) 201면",
+    "url": ""
+  },
+  {
+    "id": 63,
+    "person_slug": "gonghun-80006",
+    "label": "민족독립투쟁사사료(해외편) 132면",
+    "url": ""
+  },
+  {
+    "id": 64,
+    "person_slug": "gonghun-80006",
+    "label": "요시찰인명부(국가보훈처) 214∼216면",
+    "url": ""
+  },
+  {
+    "id": 65,
+    "person_slug": "gonghun-80006",
+    "label": "독립운동사(국가보훈처) 제4권 474면",
+    "url": ""
+  },
+  {
+    "id": 66,
+    "person_slug": "gonghun-80006",
+    "label": "독립운동사자료집(국가보훈처) 제13집 1044면",
+    "url": ""
+  },
+  {
+    "id": 67,
+    "person_slug": "gonghun-80006",
+    "label": "동아일보(1926. 10. 24)",
+    "url": ""
+  },
+  {
+    "id": 68,
+    "person_slug": "gonghun-80006",
+    "label": "조선일보(1930. 9. 14)",
+    "url": ""
+  },
+  {
+    "id": 69,
+    "person_slug": "gonghun-80006",
+    "label": "명치백년사총서(김정명) 제2권 424·439면",
+    "url": ""
+  },
+  {
+    "id": 70,
+    "person_slug": "gonghun-80006",
+    "label": "한국민족운동사료(중국편)(국회도서관) 305·309·453·543·549·585면",
+    "url": ""
+  },
+  {
+    "id": 71,
+    "person_slug": "gonghun-80006",
+    "label": "독립운동사자료집(국가보훈처) 제9집 552면",
+    "url": ""
+  },
+  {
+    "id": 72,
+    "person_slug": "gonghun-954218",
+    "label": "新韓民報(1921. 6. 23, 1924. 10. 2, 1925. 1. 29, 12. 31, 1926. 5. 27, 12. 2, 1927. 9. 22, 10. 20, 1928. 2. 9, 5. 31, 9. 27, 12. 20, 1929. 2. 21, 8. 22, 12. 12, 12. 26, 1930. 11. 27, 1931. 1. 1, 6. 4, 12. 17, 1933. 7. 13, 1934. 5. 31, 1936. 7. 9, 1937. 3. 11, 3. 18, 1938. 2, 3, 5. 12, 1939. 3. 9,  1940. 1. 18, 1942. 4. 30)",
+    "url": ""
+  },
+  {
+    "id": 73,
+    "person_slug": "gonghun-954218",
+    "label": "미주국민회자료집(도산안창호선생기념사업회, 2005) 제1권 432면, 제5권 191면, 제9권 45면, 제16권 116면, 제17권 550면",
+    "url": ""
+  },
+  {
+    "id": 74,
+    "person_slug": "gonghun-954218",
+    "label": "멕시코 프론테라 임원 등이 흥사단이사부로 보낸 편지(1928. 1. 29), 저축금 환부 청원서(1928. 2. 28), 멕시코 프론테라지방회에서 흥사단이사부로 보낸 공문(1928. 3. 21) 미주 흥사단자료(독립기념관 소장)",
+    "url": ""
+  },
+  {
+    "id": 75,
+    "person_slug": "gonghun-954893",
+    "label": "동아일보(東亞日報)(1927. 9. 26, 10. 6)",
+    "url": ""
+  },
+  {
+    "id": 76,
+    "person_slug": "gonghun-954893",
+    "label": "이야기로 만나는 경북여성(강윤정 외, 2014) 148~155면.",
+    "url": ""
+  },
+  {
+    "id": 77,
+    "person_slug": "gonghun-1059",
+    "label": "판결문(1920. 4. 15 대구복심법원)",
+    "url": ""
+  },
+  {
+    "id": 78,
+    "person_slug": "gonghun-1059",
+    "label": "독립운동사(국가보훈처) 4권 444·445·446면",
+    "url": ""
+  },
+  {
+    "id": 79,
+    "person_slug": "gonghun-1059",
+    "label": "독립운동사자료집(국가보훈처) 9권 981·982면",
+    "url": ""
+  },
+  {
+    "id": 80,
+    "person_slug": "gonghun-50002",
+    "label": "조선일보(1930. 8. 14)",
+    "url": ""
+  },
+  {
+    "id": 81,
+    "person_slug": "gonghun-50002",
+    "label": "독립운동사자료집(국가보훈처) 제13집 253·1546∼1548면",
+    "url": ""
+  },
+  {
+    "id": 82,
+    "person_slug": "gonghun-50002",
+    "label": "독립운동사(국가보훈처) 제9권 648면",
+    "url": ""
+  },
+  {
+    "id": 83,
+    "person_slug": "gonghun-1520",
+    "label": "한국독립사(김승학) 하권 74면",
+    "url": ""
+  },
+  {
+    "id": 84,
+    "person_slug": "gonghun-1520",
+    "label": "독립운동사(국가보훈처) 3권 502면",
+    "url": ""
+  },
+  {
+    "id": 85,
+    "person_slug": "gonghun-1520",
+    "label": "독립운동사자료집(국가보훈처) 5권 1489면",
+    "url": ""
+  },
+  {
+    "id": 86,
+    "person_slug": "gonghun-70520",
+    "label": "한국독립운동사(국사편찬위원회) 제4권 962면",
+    "url": ""
+  },
+  {
+    "id": 87,
+    "person_slug": "gonghun-70520",
+    "label": "고등경찰요사(경북경찰부) 재외불령선인의 상황(평북편)",
+    "url": ""
+  },
+  {
+    "id": 88,
+    "person_slug": "gonghun-7485",
+    "label": "판결문(1937. 4. 12 광주지방법원 목포지청)",
+    "url": ""
+  },
+  {
+    "id": 89,
+    "person_slug": "gonghun-7485",
+    "label": "제주도사연구(제주도사연구회, 1991. 11. 1) 160면",
+    "url": ""
+  },
+  {
+    "id": 90,
+    "person_slug": "gonghun-12759",
+    "label": "暴徒에 關한 件(1909. 1. 28) 暴徒에 關한 編冊(警務局)",
+    "url": ""
+  },
+  {
+    "id": 91,
+    "person_slug": "gonghun-12759",
+    "label": "韓民族獨立運動史資料集(國史編纂委員會, 1992) 제13권 143면",
+    "url": ""
+  },
+  {
+    "id": 92,
+    "person_slug": "gonghun-9048",
+    "label": "공적서(김전근, 제주해녀항일운동기념위원장, 2004)",
+    "url": ""
+  },
+  {
+    "id": 93,
+    "person_slug": "gonghun-9048",
+    "label": "判決文(大邱覆審法院, 1933. 6. 5)",
+    "url": ""
+  },
+  {
+    "id": 94,
+    "person_slug": "gonghun-9048",
+    "label": "朝鮮日報(1932. 3. 4)",
+    "url": ""
+  },
+  {
+    "id": 95,
+    "person_slug": "gonghun-9048",
+    "label": "刑事事件簿(朝鮮總督府 光州地方法院 木浦支廳 檢査分局)",
+    "url": ""
+  },
+  {
+    "id": 96,
+    "person_slug": "gonghun-9048",
+    "label": "身分帳指紋原紙(경찰청)",
+    "url": ""
+  },
+  {
+    "id": 97,
+    "person_slug": "gonghun-9048",
+    "label": "제주도지(제주도, 1982) 상권, 410-417면",
+    "url": ""
+  },
+  {
+    "id": 98,
+    "person_slug": "gonghun-9048",
+    "label": "牛島誌(제주도지편찬위원회, 1996) 400면",
+    "url": ""
+  },
+  {
+    "id": 99,
+    "person_slug": "gonghun-9048",
+    "label": "東亞日報(1932. 12. 11, 12. 14, 12. 16, 12. 22, 12. 25, 1933. 2. 8, 2. 21, 3. 3)",
+    "url": ""
+  },
+  {
+    "id": 100,
+    "person_slug": "gonghun-35003",
+    "label": "독립운동사(독립운동사편찬위원회) 제3권 66면",
+    "url": ""
+  },
+  {
+    "id": 101,
+    "person_slug": "gonghun-35003",
+    "label": "判決文(公州地方法院:1919. 5. 13)",
+    "url": ""
+  },
+  {
+    "id": 102,
+    "person_slug": "gonghun-955397",
+    "label": "身分帳指紋原紙(警察廳)",
+    "url": ""
+  },
+  {
+    "id": 103,
+    "person_slug": "gonghun-955397",
+    "label": "每日申報(1921. 4. 18, 8. 6)",
+    "url": ""
+  },
+  {
+    "id": 104,
+    "person_slug": "gonghun-950430",
+    "label": "공적조서(2018)",
+    "url": "https://e-gonghun.mpva.go.kr/opnAPI/publicReportList.do?nPageIndex=1&nCountPerPage=1&type=JSON&mngNo=950430"
+  },
+  {
+    "id": 105,
+    "person_slug": "gonghun-8108",
+    "label": "공적조서(1991)",
+    "url": "https://e-gonghun.mpva.go.kr/opnAPI/publicReportList.do?nPageIndex=1&nCountPerPage=1&type=JSON&mngNo=8108"
+  },
+  {
+    "id": 106,
+    "person_slug": "gonghun-1069",
+    "label": "공적조서(1990)",
+    "url": "https://e-gonghun.mpva.go.kr/opnAPI/publicReportList.do?nPageIndex=1&nCountPerPage=1&type=JSON&mngNo=1069"
+  },
+  {
+    "id": 107,
+    "person_slug": "gonghun-952208",
+    "label": "공적조서(2020)",
+    "url": "https://e-gonghun.mpva.go.kr/opnAPI/publicReportList.do?nPageIndex=1&nCountPerPage=1&type=JSON&mngNo=952208"
+  },
+  {
+    "id": 108,
+    "person_slug": "gonghun-1421",
+    "label": "공적조서(1990)",
+    "url": "https://e-gonghun.mpva.go.kr/opnAPI/publicReportList.do?nPageIndex=1&nCountPerPage=1&type=JSON&mngNo=1421"
   }
 ]
