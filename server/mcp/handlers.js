@@ -47,3 +47,22 @@ export function submitChangeRequest(db, { personSlug, requesterName, contact, fi
 export function listRequests(db, { status } = {}) {
   return q.listChangeRequests(db, { status });
 }
+
+export function getRequestDetail(db, id) {
+  const request = q.getChangeRequest(db, id);
+  if (!request) return null;
+  return { request, reviews: q.listReviews(db, id), quorum: q.reviewStatus(db, id) };
+}
+
+const VERDICTS = ["approve", "reject", "needs_work"];
+
+export function submitReview(db, { requestId, reviewerName, verdict, comment } = {}) {
+  if (!requestId || !reviewerName || !verdict || !comment) {
+    throw new Error("필수값 누락: requestId, reviewerName, verdict, comment");
+  }
+  if (!VERDICTS.includes(verdict)) throw new Error(`verdict는 ${VERDICTS.join("|")} 중 하나여야 합니다`);
+  const request = q.getChangeRequest(db, requestId);
+  if (!request) throw new Error("요청을 찾을 수 없습니다");
+  if (request.status !== "in_review") throw new Error("심사 중인 요청만 리뷰할 수 있습니다");
+  return { id: q.addReview(db, { requestId, reviewerName, verdict, comment }) };
+}
