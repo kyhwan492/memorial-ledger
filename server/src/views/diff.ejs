@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko">
+<head><%- include("partials/head") %></head>
+<body>
+<nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
+<h1>버전 #<%= v.id %> 변경 내역</h1>
+<p><a href="/persons/<%= v.person_slug %>"><%= v.person_slug %></a> ·
+   <% if (prev) { %>직전 버전 #<%= prev.id %>과 비교<% } else { %>최초 버전<% } %></p>
+<p>변경 사유: <%= note || "(없음)" %></p>
+<table>
+  <thead><tr><th>필드</th><th>이전</th><th>이후</th></tr></thead>
+  <tbody>
+  <% for (const r of rows) { %>
+  <tr>
+    <td><%= r.key %></td>
+    <td><%= r.before %></td>
+    <td><% if (r.changed) { %><span class="badge warn"><%= r.after %></span><% } else { %><%= r.after %><% } %></td>
+  </tr>
+  <% } %>
+  </tbody>
+</table>
+</body>
+</html>

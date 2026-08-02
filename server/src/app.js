@@ -52,11 +52,13 @@ export function createApp(db, config = {}) {
   app.get("/persons/:slug", (req, res) => {
     const person = q.getPerson(db, req.params.slug);
     if (!person) return res.status(404).send("인물을 찾을 수 없습니다");
+    const versions = q.listVersions(db, person.slug);
     res.render("person", {
-      person, CATEGORIES, chain,
+      person, CATEGORIES, chain, versions,
       personIdHex: ethers.id(person.slug),
       sources: q.listSources(db, person.slug),
-      versions: q.listVersions(db, person.slug),
+      chainIndexes: Object.fromEntries(versions.map((v) => [v.id, q.chainIndexOf(db, v.id)])),
+      openRequests: q.listChangeRequests(db, { personSlug: person.slug, status: "open" }).length,
     });
   });
 
@@ -78,7 +80,7 @@ export function createApp(db, config = {}) {
   });
 
   app.post("/persons", (req, res) => {
-    const { slug, name, category, birth, death, summary } = req.body;
+    const { slug, name, category, birth, death, summary, note } = req.body;
     if (!slug || !name || !CATEGORIES[category]) {
       return res.status(400).send("slug, 이름, 분류는 필수입니다");
     }
@@ -86,12 +88,40 @@ export function createApp(db, config = {}) {
     const content = {
       slug, name, category,
       birth: birth ?? "", death: death ?? "", summary: summary ?? "",
+      note: note || "최초 등록",
       sources: q.listSources(db, slug).map((s) => ({ label: s.label, url: s.url })),
     };
     const canonical = canonicalize(content);
     const contentHash = ethers.keccak256(ethers.toUtf8Bytes(canonical));
     const versionId = q.createDraft(db, { personSlug: slug, contentJson: canonical, contentHash });
     res.redirect(`/versions/${versionId}/anchor`);
+  });
+
+  app.get("/versions/:id.json", (req, res) => {
+    const v = db.prepare("SELECT * FROM record_versions WHERE id = ?").get(req.params.id);
+    if (!v || v.status !== "anchored") return res.status(404).json({ error: "앵커된 버전이 아닙니다" });
+    res.json({
+      content: JSON.parse(v.content_json),
+      contentHash: v.content_hash,
+      txHash: v.tx_hash,
+      chainIndex: q.chainIndexOf(db, v.id),
+    });
+  });
+
+  app.get("/versions/:id/diff", (req, res) => {
+    const v = db.prepare("SELECT * FROM record_versions WHERE id = ?").get(req.params.id);
+    if (!v) return res.status(404).send("버전을 찾을 수 없습니다");
+    const prev = db.prepare(
+      "SELECT * FROM record_versions WHERE person_slug = ? AND id < ? ORDER BY id DESC LIMIT 1"
+    ).get(v.person_slug, v.id);
+    const after = JSON.parse(v.content_json);
+    const before = prev ? JSON.parse(prev.content_json) : {};
+    const show = (x) => (x === undefined ? "" : typeof x === "string" ? x : JSON.stringify(x));
+    const rows = [...new Set([...Object.keys(before), ...Object.keys(after)])].map((key) => ({
+      key, before: show(before[key]), after: show(after[key]),
+      changed: show(before[key]) !== show(after[key]),
+    }));
+    res.render("diff", { v, prev, rows, note: after.note ?? "" });
   });
 
   app.get("/versions/:id/anchor", (req, res) => {
@@ -109,6 +139,52 @@ export function createApp(db, config = {}) {
     if (!v) return res.status(404).json({ error: "버전 없음" });
     q.markAnchored(db, { versionId: Number(req.params.id), txHash, wallet });
     res.json({ ok: true });
+  });
+
+  // ponytail: 요청 제출·처리에 서버 로그인 없음 — v1 원칙 그대로, 실명과 처리자
+  // 이름을 공개 기록으로 남기는 것이 유일한 책임 장치다.
+  app.get("/requests", (req, res) => {
+    const requests = q.listChangeRequests(db, { status: req.query.status });
+    res.render("requests", { requests, status: req.query.status ?? "" });
+  });
+
+  app.get("/requests/new", (req, res) => {
+    const person = q.getPerson(db, req.query.person);
+    if (!person) return res.status(404).send("인물을 찾을 수 없습니다");
+    res.render("request-new", { person });
+  });
+
+  app.post("/requests", (req, res) => {
+    const { person, requesterName, contact, field, proposed, evidence } = req.body;
+    if (!person || !requesterName || !contact || !field || !proposed || !evidence) {
+      return res.status(400).send("이름, 연락처, 대상 필드, 제안 내용, 근거 출처는 모두 필수입니다");
+    }
+    if (!q.getPerson(db, person)) return res.status(404).send("인물을 찾을 수 없습니다");
+    const id = q.addChangeRequest(db, {
+      personSlug: person, requesterName, contact, field, proposed, evidence,
+    });
+    res.redirect(`/requests/${id}`);
+  });
+
+  app.get("/requests/:id", (req, res) => {
+    const request = q.getChangeRequest(db, req.params.id);
+    if (!request) return res.status(404).send("요청을 찾을 수 없습니다");
+    res.render("request", { request, person: q.getPerson(db, request.person_slug) });
+  });
+
+  app.post("/requests/:id/resolve", (req, res) => {
+    const request = q.getChangeRequest(db, req.params.id);
+    if (!request) return res.status(404).send("요청을 찾을 수 없습니다");
+    const { status, resolverName, note, versionId } = req.body;
+    if (!["accepted", "rejected"].includes(status) || !resolverName) {
+      return res.status(400).send("처리 상태와 처리자 이름은 필수입니다");
+    }
+    if (status === "rejected" && !note) return res.status(400).send("반려 사유는 필수입니다");
+    q.resolveChangeRequest(db, {
+      id: Number(req.params.id), status, resolverName, note,
+      versionId: versionId ? Number(versionId) : null,
+    });
+    res.redirect(`/requests/${req.params.id}`);
   });
 
   return app;
