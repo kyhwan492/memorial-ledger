@@ -93,3 +93,6 @@ node scripts/snapshot.js import   # data-snapshot/*.json → DB (복원/미러 �
 
 수정 요청의 연락처(`requester_contact`)는 공개용이 아니므로 스냅샷·웹 상세·MCP
 어디에도 노출되지 않는다 (작성자 연락용으로 서버 DB에만 남는다).
+
+인물 기록의 원 데이터는 [국가보훈부 독립유공자 공훈록 정보](https://www.data.go.kr/data/15057718/openapi.do)
+(공공데이터포털, 이용허락범위 제한 없음)에서 가져오며, 각 기록에 출처가 표시된다.
