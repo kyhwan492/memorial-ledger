@@ -272,7 +272,7 @@ load().catch((e) => { status.textContent = `로드 실패: ${e.shortMessage ?? e
 
 **Interfaces:**
 - Consumes: db.js `openDb/upsertPerson/addSource`
-- Produces: `mapRow(apiRow) -> {slug, name, category:"independence", birth, death, summary}` (gonghun-map.js), CLI `GONGHUN_API_KEY=... node scripts/import-gonghun.js [--limit 100] [--page 1]`
+- Produces: `mapRow(apiRow) -> {slug, name, category:"independence", birth, death, summary}` (gonghun-map.js), CLI `node scripts/import-gonghun.js [--limit 100] [--page 1]`
 
 - [ ] **Step 1: API 스펙 확인** — https://www.data.go.kr/data/15057718/openapi.do 문서(WebFetch/curl)에서 엔드포인트·요청 파라미터·응답 필드명을 확인해 매핑을 작성한다. 문서 접근이 안 되면 필드명을 추정하지 말고 리포트에 명시하고 매핑 함수를 TODO 없이 "문서 기반으로 확인된 필드만" 구현.
 

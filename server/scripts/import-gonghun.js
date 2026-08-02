@@ -1,23 +1,13 @@
 // 국가보훈부 독립유공자 공훈록 임포트.
 // API 문서: https://e-gonghun.mpva.go.kr/user/ContribuMeritOpenAPI.do?goTocode=50002
-// 사용: GONGHUN_API_KEY=... node scripts/import-gonghun.js [--limit 100] [--page 1]
+// 이 엔드포인트는 인증키 없이 동작한다 (실호출 확인).
+// 사용: node scripts/import-gonghun.js [--limit 100] [--page 1]
 import { openDb, upsertPerson, addSource, listSources } from "../src/db.js";
 import { mapRow } from "./gonghun-map.js";
 
 const API = "https://e-gonghun.mpva.go.kr/opnAPI/contribuMeritList.do";
-const PAGE_SIZE = 50; // 문서상 최대
+const PAGE_SIZE = 50; // 문서상 최대. 페이지 창이 밀리지 않도록 항상 고정 크기로 요청한다
 const SOURCE = { label: "국가보훈부 공훈전자사료관", url: "https://e-gonghun.mpva.go.kr/" };
-
-const USAGE = `사용법: GONGHUN_API_KEY=<data.go.kr 인증키> node scripts/import-gonghun.js [--limit 100] [--page 1]
-
-  --limit N   가져올 인원 수 (기본 100)
-  --page N    시작 페이지 (1부터, 페이지당 ${PAGE_SIZE}명)
-  DB_PATH     대상 SQLite 파일 (기본 data/ledger.db)`;
-
-if (!process.env.GONGHUN_API_KEY) {
-  console.error(USAGE);
-  process.exit(1);
-}
 
 function arg(name, fallback) {
   const i = process.argv.indexOf(`--${name}`);
@@ -37,18 +27,18 @@ const startPage = arg("page", 1);
 const db = openDb(process.env.DB_PATH ?? "data/ledger.db");
 
 let imported = 0;
-for (let page = startPage; imported < limit; page++) {
-  const count = Math.min(PAGE_SIZE, limit - imported);
+outer: for (let page = startPage; imported < limit; page++) {
   let items;
   try {
-    items = await fetchPage(page, count);
+    items = await fetchPage(page, PAGE_SIZE);
   } catch (e) {
     console.error(`${page}페이지 실패(${e.message}) — 1회 재시도`);
-    items = await fetchPage(page, count); // 재시도도 실패하면 그대로 중단
+    items = await fetchPage(page, PAGE_SIZE); // 재시도도 실패하면 그대로 중단
   }
   if (items.length === 0) break; // 마지막 페이지
 
   for (const item of items) {
+    if (imported >= limit) break outer;
     let person;
     try {
       person = mapRow(item);

@@ -38,12 +38,11 @@ event Donated(personId indexed, donor indexed, amount)
 ## 임포트 — server/scripts/import-gonghun.js
 
 - 공공데이터포털 공훈록 API 호출 → 응답 필드를 persons/sources로 매핑해 upsert.
-- API 키는 `GONGHUN_API_KEY` env로만 받는다(커밋 금지). 키는 사용자가 data.go.kr에서
-  발급.
+- 공훈전자사료관 오픈API 엔드포인트는 인증키 없이 동작한다(실호출 확인) — 키 발급 불필요.
 - `--limit N`(기본 100), `--page` 지원. slug는 관리번호 기반(`gonghun-<관리번호>`),
   category는 `independence`, 출처는 공훈전자사료관 링크 자동 추가.
-- 응답 → person 매핑 함수는 순수 함수로 분리해 픽스처 JSON으로 유닛 테스트.
-  실제 API 호출은 키 없이는 실행 불가이므로 테스트 범위 밖(수동 검증).
+- 응답 → person 매핑 함수는 순수 함수로 분리해 픽스처(실응답) JSON으로 유닛 테스트.
+  네트워크 호출부는 유닛 테스트 범위 밖(실호출로 수동 검증).
 
 ## 범위 밖
 

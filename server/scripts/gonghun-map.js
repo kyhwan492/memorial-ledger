@@ -12,7 +12,7 @@ export function mapRow(item) {
   // 관리번호가 있으면 그게 유일 키. 없으면 이름+생년으로 만든다(문서상 필수 필드가 아님).
   const slug = mngNo
     ? `gonghun-${mngNo}`
-    : `gonghun-${name.replace(/\s+/g, "-")}-${birth.slice(0, 4)}`;
+    : ["gonghun", name.replace(/\s+/g, "-"), birth.slice(0, 4)].filter(Boolean).join("-");
 
   return {
     slug,
