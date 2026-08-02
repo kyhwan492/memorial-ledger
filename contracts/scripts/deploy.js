@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  const [owner, author, beneficiary] = await ethers.getSigners();
+  const [owner, author, beneficiary, tokenDonor] = await ethers.getSigners();
   const registry = await ethers.deployContract("RecordRegistry");
   await registry.waitForDeployment();
   const address = await registry.getAddress();
@@ -24,8 +24,20 @@ async function main() {
     console.log("수혜자 등록:", beneficiary.address);
   }
 
+  // 로컬 데모용 ERC-20 (Sepolia에선 tokenDonor가 없어 스킵)
+  let tokensEnv = "";
+  if (tokenDonor) {
+    const token = await ethers.deployContract("TestToken");
+    await token.waitForDeployment();
+    const tokenAddress = await token.getAddress();
+    console.log("TestToken(TKRW):", tokenAddress);
+    await (await token.transfer(tokenDonor.address, ethers.parseEther("10000"))).wait();
+    console.log("데모 후원자 TKRW 지급:", tokenDonor.address);
+    tokensEnv = ` TOKENS='[{"symbol":"TKRW","address":"${tokenAddress}","decimals":18}]'`;
+  }
+
   console.log(
-    `\n서버 실행:\n  CONTRACT_ADDRESS=${address} DONATIONS_ADDRESS=${donationsAddress} node src/server.js`
+    `\n서버 실행:\n  CONTRACT_ADDRESS=${address} DONATIONS_ADDRESS=${donationsAddress}${tokensEnv} node src/server.js`
   );
 }
 
