@@ -4,7 +4,22 @@
 keccak256 해시를 체인(RecordRegistry)에 앵커링하는 학습 프로젝트.
 누구나 브라우저에서 서버를 신뢰하지 않고 기록의 변조 여부를 검증할 수 있다.
 
-문서: 내부 동작 상세 `docs/architecture.md` · 설계 배경 `docs/superpowers/specs/2026-08-01-record-registry-design.md` · 웹 소개 페이지 `/about`
+문서: 내부 동작 상세 `docs/architecture.md` · 설계 배경 `docs/superpowers/specs/2026-08-01-record-registry-design.md` · 웹 소개 페이지 `/about` · 기여 안내 `CONTRIBUTING.md`
+
+라이선스: **AGPL-3.0-only** — 이 코드로 서비스를 운영하는 누구든 변형한 코드를
+공개해야 합니다. 기록의 정통성은 코드가 아니라 체인 앵커·출처·실명 심사 이력으로
+구분됩니다.
+
+## 알려진 한계 (학습 프로젝트)
+
+실서비스 전 반드시 보완해야 하는 것들:
+
+- **스팸 방어 없음** — 수정 요청·리뷰 제출에 rate limit/captcha가 없다.
+- **서버 인증 없음** — 작성자·검토자 확인은 온체인 allowlist와 실명 공개 기록에
+  의존한다. 요청 처리(수용/반려)에 서버 로그인이 없다.
+- **법적 검토 전** — 명예훼손(사실적시 포함), 기부금품법, 개인정보보호법 대응이
+  설계에 반영되지 않았다. 테스트넷 전용.
+- USDT류(비표준 approve) 실토큰 대응 미구현 (`Donations.sol` 주석 참고).
 
 ## 요구 사항
 
