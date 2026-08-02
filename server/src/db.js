@@ -9,7 +9,12 @@ CREATE TABLE IF NOT EXISTS persons (
   category TEXT NOT NULL,
   birth TEXT NOT NULL DEFAULT '',
   death TEXT NOT NULL DEFAULT '',
-  summary TEXT NOT NULL DEFAULT ''
+  summary TEXT NOT NULL DEFAULT '',
+  hunkuk TEXT NOT NULL DEFAULT '',
+  workout_affil TEXT NOT NULL DEFAULT '',
+  judge_year TEXT NOT NULL DEFAULT '',
+  alias TEXT NOT NULL DEFAULT '',
+  sex TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS sources (
   id INTEGER PRIMARY KEY,
@@ -64,28 +69,40 @@ export function openDb(path = ":memory:") {
   const db = new DatabaseSync(path);
   db.exec("PRAGMA foreign_keys = ON;");
   db.exec(SCHEMA);
+  // 스키마 진화: 기존 DB에 없는 persons 컬럼을 추가한다 (CREATE IF NOT EXISTS는 ALTER하지 않음)
+  const existing = new Set(db.prepare("PRAGMA table_info(persons)").all().map((c) => c.name));
+  for (const col of ["hunkuk", "workout_affil", "judge_year", "alias", "sex"]) {
+    if (!existing.has(col)) db.exec(`ALTER TABLE persons ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`);
+  }
   return db;
 }
 
-export function upsertPerson(db, { slug, name, category, birth, death, summary }) {
+export function upsertPerson(db, { slug, name, category, birth, death, summary,
+  hunkuk, workoutAffil, judgeYear, alias, sex }) {
   db.prepare(`
-    INSERT INTO persons (slug, name, category, birth, death, summary)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO persons (slug, name, category, birth, death, summary,
+                         hunkuk, workout_affil, judge_year, alias, sex)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(slug) DO UPDATE SET
       name = excluded.name, category = excluded.category,
-      birth = excluded.birth, death = excluded.death, summary = excluded.summary
-  `).run(slug, name, category, birth ?? "", death ?? "", summary ?? "");
+      birth = excluded.birth, death = excluded.death, summary = excluded.summary,
+      hunkuk = excluded.hunkuk, workout_affil = excluded.workout_affil,
+      judge_year = excluded.judge_year, alias = excluded.alias, sex = excluded.sex
+  `).run(slug, name, category, birth ?? "", death ?? "", summary ?? "",
+    hunkuk ?? "", workoutAffil ?? "", judgeYear ?? "", alias ?? "", sex ?? "");
 }
 
 export function getPerson(db, slug) {
   return db.prepare("SELECT * FROM persons WHERE slug = ?").get(slug);
 }
 
-export function listPersons(db, { q, category } = {}) {
+export function listPersons(db, { q, category, hunkuk, workoutAffil } = {}) {
   let sql = "SELECT * FROM persons WHERE 1=1";
   const params = [];
   if (q) { sql += " AND name LIKE ?"; params.push(`%${q}%`); }
   if (category) { sql += " AND category = ?"; params.push(category); }
+  if (hunkuk) { sql += " AND hunkuk = ?"; params.push(hunkuk); }
+  if (workoutAffil) { sql += " AND workout_affil = ?"; params.push(workoutAffil); }
   sql += " ORDER BY name";
   return db.prepare(sql).all(...params);
 }
@@ -205,4 +222,11 @@ export function reviewStatus(db, requestId) {
 
 export function escalateRequest(db, id) {
   db.prepare("UPDATE change_requests SET status = 'in_review' WHERE id = ? AND status = 'open'").run(id);
+}
+
+// 찾기 필터용 distinct 값 (빈 값 제외)
+export function listFilterValues(db) {
+  const vals = (col) =>
+    db.prepare(`SELECT DISTINCT ${col} AS v FROM persons WHERE ${col} != '' ORDER BY v`).all().map((r) => r.v);
+  return { hunkuks: vals("hunkuk"), affils: vals("workout_affil") };
 }

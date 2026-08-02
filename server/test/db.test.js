@@ -5,7 +5,7 @@ import {
   createDraft, markAnchored, listVersions, latestAnchored,
   addAuthor, getAuthor, listAuthors,
   addChangeRequest, getChangeRequest, listChangeRequests, resolveChangeRequest, chainIndexOf,
-  addReview, listReviews, reviewStatus, escalateRequest,
+  addReview, listReviews, reviewStatus, escalateRequest, listFilterValues,
 } from "../src/db.js";
 
 function seedPerson(db) {
@@ -112,4 +112,22 @@ test("리뷰 정족수: 최신 평결 기준, 제안자 제외", () => {
   assert.equal(listReviews(db, id).length, 4);
   resolveChangeRequest(db, { id, status: "accepted", resolverName: "홍역사", note: "반영" });
   assert.equal(getChangeRequest(db, id).status, "accepted"); // in_review에서도 처리 가능
+});
+
+test("확장 필드 upsert·필터·distinct, 기존 DB 마이그레이션", () => {
+  const db = openDb();
+  upsertPerson(db, { slug: "kim-gu", name: "김구", category: "independence",
+    birth: "1876", death: "1949", summary: "x",
+    hunkuk: "대한민국장", workoutAffil: "임시정부", judgeYear: "1962", alias: "백범", sex: "남" });
+  upsertPerson(db, { slug: "yu-gwansun", name: "유관순", category: "independence",
+    birth: "1902", death: "1920", summary: "y", hunkuk: "대한민국장", workoutAffil: "3·1운동" });
+  assert.equal(getPerson(db, "kim-gu").alias, "백범");
+  assert.equal(listPersons(db, { hunkuk: "대한민국장" }).length, 2);
+  assert.equal(listPersons(db, { workoutAffil: "임시정부" })[0].slug, "kim-gu");
+  assert.deepEqual(listFilterValues(db), {
+    hunkuks: ["대한민국장"], affils: ["3·1운동", "임시정부"],
+  });
+  // 구버전 upsert(새 필드 없음)도 동작
+  upsertPerson(db, { slug: "old", name: "구버전", category: "korean_war", birth: "", death: "", summary: "" });
+  assert.equal(getPerson(db, "old").hunkuk, "");
 });
