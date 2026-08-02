@@ -2,7 +2,7 @@
 <html lang="ko">
 <head><%- include("partials/head") %></head>
 <body>
-<nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
+<%- include("partials/nav") %>
 <h1>버전 #<%= v.id %> 변경 내역</h1>
 <p><a href="/persons/<%= v.person_slug %>"><%= v.person_slug %></a> ·
    <% if (prev) { %>직전 버전 #<%= prev.id %>과 비교<% } else { %>최초 버전<% } %></p>

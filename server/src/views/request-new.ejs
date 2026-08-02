@@ -2,7 +2,7 @@
 <html lang="ko">
 <head><%- include("partials/head") %></head>
 <body>
-<nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
+<%- include("partials/nav") %>
 <h1><%= person.name %> 기록 수정 요청</h1>
 <p>이름과 근거는 공개 페이지에 그대로 노출됩니다. 익명 요청은 받지 않습니다.</p>
 <form method="post" action="/requests">

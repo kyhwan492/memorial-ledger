@@ -2,15 +2,14 @@
 <html lang="ko">
 <head><%- include("partials/head") %></head>
 <body>
-<nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a><a href="/persons/new/edit">기록 등록</a></nav>
+<%- include("partials/nav") %>
 <h1>기억 원장</h1>
 <% if (monthly) { %>
-<section>
-  <h2>이달의 독립운동가</h2>
-  <p><% if (monthly.slug) { %><a href="/persons/<%= monthly.slug %>"><%= monthly.name %></a>
-     <% } else { %><%= monthly.name %><% } %>
-     <small>(<%= monthly.year %>년 <%= monthly.month %>월)</small></p>
-  <% if (monthly.summary) { %><p><%= monthly.summary %></p><% } %>
+<section class="monthly">
+  <p class="label"><%= monthly.year %>년 <%= monthly.month %>월 이달의 독립운동가</p>
+  <p class="name"><% if (monthly.slug) { %><a href="/persons/<%= monthly.slug %>"><%= monthly.name %></a>
+     <% } else { %><%= monthly.name %><% } %></p>
+  <% if (monthly.summary) { %><p class="muted"><%= monthly.summary %></p><% } %>
 </section>
 <% } %>
 <form>

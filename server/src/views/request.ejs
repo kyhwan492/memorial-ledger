@@ -2,7 +2,7 @@
 <html lang="ko">
 <head><%- include("partials/head") %></head>
 <body>
-<nav><a href="/">인물 목록</a><a href="/requests">수정 요청</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
+<%- include("partials/nav") %>
 <h1>수정 요청 #<%= request.id %></h1>
 <dl>
   <dt>인물</dt><dd><a href="/persons/<%= request.person_slug %>"><%= person ? person.name : request.person_slug %></a></dd>
