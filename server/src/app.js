@@ -62,6 +62,10 @@ export function createApp(db, config = {}) {
     res.render("authors", { authors: q.listAuthors(db) });
   });
 
+  app.get("/about", (req, res) => {
+    res.render("about");
+  });
+
   // ponytail: draft 작성에 서버 로그인 없음 — 진짜 게이트는 온체인 allowlist
   // (미등록 지갑은 anchor 트랜잭션이 revert). 서버 세션 인증은 후속 작업.
   app.get("/persons/:slug/edit", (req, res) => {

@@ -2,7 +2,7 @@
 <html lang="ko">
 <head><%- include("partials/head") %></head>
 <body>
-<nav><a href="/">인물 목록</a><a href="/authors">작성자</a></nav>
+<nav><a href="/">인물 목록</a><a href="/authors">작성자</a><a href="/about">소개</a></nav>
 <h1><%= person.name %></h1>
 <p><%= CATEGORIES[person.category] ?? person.category %> · <%= person.birth %>–<%= person.death %></p>
 <p><%= person.summary %></p>

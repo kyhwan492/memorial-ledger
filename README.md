@@ -4,7 +4,7 @@
 keccak256 해시를 체인(RecordRegistry)에 앵커링하는 학습 프로젝트.
 누구나 브라우저에서 서버를 신뢰하지 않고 기록의 변조 여부를 검증할 수 있다.
 
-설계 문서: `docs/superpowers/specs/2026-08-01-record-registry-design.md`
+문서: 내부 동작 상세 `docs/architecture.md` · 설계 배경 `docs/superpowers/specs/2026-08-01-record-registry-design.md` · 웹 소개 페이지 `/about`
 
 ## 요구 사항
 

@@ -133,3 +133,10 @@ test("latest.json은 앵커된 최신 버전만 준다", async (t) => {
   assert.equal(body.contentHash, "0x" + "cd".repeat(32));
   assert.equal(body.txHash, "0x" + "ef".repeat(32));
 });
+
+test("소개 페이지가 검증 원리를 설명한다", async (t) => {
+  const { base } = makeServer(t);
+  const html = await (await fetch(base + "/about")).text();
+  assert.match(html, /불변성/);
+  assert.match(html, /진실성/);
+});
